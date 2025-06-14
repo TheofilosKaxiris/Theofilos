@@ -24,6 +24,8 @@ async function fetchEurostatData() {
         if (economyDiv) {
             economyDiv.textContent = `API Data: ${JSON.stringify(data)}`;
         }
+        // Chart.js: Show GDP growth chart
+        renderGdpGrowthChart(data);
     } catch (error) {
         console.error('Error fetching Eurostat data:', error);
     }
