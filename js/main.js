@@ -2,7 +2,7 @@
 console.log('Eurostat Greece Statistics site loaded.');
 
 // Example API endpoint (replace with your actual endpoint)
-const API_URL = 'https://eurostat-akis-a0dgcbhcemhzdghq.westeurope-01.azurewebsites.net/home/statistics';
+const API_URL = 'https://eurostat-akis-a0dgcbhcemhzdghq.westeurope-01.azurewebsites.net/home/gdp-growth';
 
 async function fetchEurostatData() {
     try {
