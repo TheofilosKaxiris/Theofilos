@@ -19,11 +19,7 @@ async function fetchEurostatData() {
         }
         const data = await response.json();
         console.log('Eurostat data:', data);
-        // Show the data in the economy section under the existing div
-        const economyDiv = document.getElementById('economy-api-data');
-        if (economyDiv) {
-            economyDiv.textContent = `API Data: ${JSON.stringify(data)}`;
-        }
+       
         // Chart.js: Show GDP growth chart
         renderGdpGrowthChart(data);
     } catch (error) {

@@ -93,3 +93,10 @@ h2 {
     color: #003399;
     font-weight: bold;
 }
+
+#gdp-main-unit-label {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #003399;
+}
