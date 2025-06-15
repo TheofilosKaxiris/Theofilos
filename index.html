@@ -14,10 +14,18 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
     <link rel="shortcut icon" href="favicon/favicon.ico">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-599PBS1V4S"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-599PBS1V4S');
+    </script>
 </head>
 <body>
     <header class="bg-primary text-white py-3 mb-4">
-        <h1 class="text-center">Eurostat Statistics</h1>
+        <h1 class="text-center">Simple Eurostats</h1>
         <nav class="text-center">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-white" href="#economy">Economy</a></li>
@@ -33,10 +41,6 @@
                     data-ad-slot="1234567890"></ins>
             </div>
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
-                <section id="overview" class="card w-100 my-3">
-                    <h2>Welcome</h2>
-                    <p>Welcome! This is a website about interesting Eurostat statistics, with a focus on Greece. Explore economic data, all visualized and easy to understand.</p>
-                </section>
                 <section id="economy" class="card w-100 my-3">
                     <h2>Economy</h2>
                     <div id="gdp-main-unit-label"></div>
