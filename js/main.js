@@ -1,18 +1,8 @@
-// You can add your JavaScript code here for interactivity.
-console.log('Eurostat Greece Statistics site loaded.');
-
-// Example API endpoint (replace with your actual endpoint)
 const API_URL = 'https://eurostat-akis-a0dgcbhcemhzdghq.westeurope-01.azurewebsites.net/home/eurostat-data';
 
-async function fetchEurostatData() {
+async function fetchEurostatData(eurostatUrl) {
     try {
-        // Get the value from the input box (if it exists)
-        var eurostatUrl = '';
-        var urlInput = document.getElementById('eurostatUrlInput');
-        if (urlInput) {
-            eurostatUrl = encodeURIComponent(urlInput.value);
-        }
-        const response = await fetch(API_URL + `?url=${eurostatUrl}`, {
+        const response = await fetch(API_URL + `?url=${encodeURIComponent(eurostatUrl)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -25,14 +15,9 @@ async function fetchEurostatData() {
         }
         const data = await response.json();
         console.log('Eurostat data:', data);
-       
-        renderGenericEurostatChart(data);
+
+        return data;
     } catch (error) {
         console.error('Error fetching Eurostat data:', error);
     }
 }
-
-// Fetch data on page load
-window.addEventListener('DOMContentLoaded', () => {
-    fetchEurostatData();
-});

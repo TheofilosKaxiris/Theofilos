@@ -24,11 +24,11 @@
 </head>
 <body>
     <header class="bg-primary text-white py-3 mb-4">
-        <h1 class="text-center">Eurostat Tourism Charts</h1>
+        <h1 class="text-center">Charts from Eurostat data</h1>
         <nav class="text-center">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-white" href="../index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="greece-gdp.html">Greece GDP</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="gdp.html">Greece GDP</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="tourism.html">Tourism</a></li>
             </ul>
         </nav>
@@ -43,15 +43,18 @@
             </div>
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
                 <section id="tourism-nights" class="card w-100 my-3">
-                    <h2>Tourism: Nights Spent Comparison</h2>
+                    <h2>Nights Spent Comparison</h2>
+                    <input type="text" id="tourismNightsInput" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en">
                     <canvas id="tourismNightsChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
                 <section id="establishments-compare" class="card w-100 my-3">
-                    <h2>Tourism: Establishments Comparison</h2>
+                    <h2>Establishments Comparison</h2>
+                    <input type="text" id="establishmentsCompareInput" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_cap_nat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&accomunit=ESTBL&nace_r2=I551-I553&lang=en">
                     <canvas id="establishmentsCompareChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
                 <section id="occupancy-rate-compare" class="card w-100 my-3">
-                    <h2>Tourism: Occupancy Rate Comparison</h2>
+                    <h2>Occupancy Rate Comparison</h2>
+                    <input type="text" id="occupancyRateCompareInput" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_anor?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=PC&accomunit=BEDPL&hotelsize=TOTAL&lang=en">
                     <canvas id="occupancyRateCompareChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
             </main>
@@ -64,8 +67,46 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/tourism-charts.js"></script>
+    <script src="../js/charts.js"></script>
+    <script src="../js/main.js"></script>
     <script>
+        var tourismNightsChart = null;
+        var establishmentsCompareChart = null;
+        var occupancyRateCompareChart = null;
+
+         window.addEventListener('DOMContentLoaded', async () => {
+
+            var tourismNightsEl = document.getElementById('tourismNightsInput');
+            var establishmentsCompareEl = document.getElementById('establishmentsCompareInput');
+            var occupancyRateCompareEl = document.getElementById('occupancyRateCompareInput');
+
+            let tourismNightsChartData = await fetchEurostatData(tourismNightsEl.value);
+            let establishmentsCompareChartData = await fetchEurostatData(establishmentsCompareEl.value);
+            let occupancyRateCompareChartData = await fetchEurostatData(occupancyRateCompareEl.value);
+
+            tourismNightsChart = renderEurostatChart(tourismNightsChartData, "tourismNightsChart", tourismNightsChart);
+            establishmentsCompareChart = renderEurostatChart(establishmentsCompareChartData, "establishmentsCompareChart", establishmentsCompareChart);
+            occupancyRateCompareChart = renderEurostatChart(occupancyRateCompareChartData, "occupancyRateCompareChart", occupancyRateCompareChart);
+
+            tourismNightsEl.addEventListener('keydown', async function (event) {
+                if (event.key === 'Enter') {
+                    tourismNightsChart = renderEurostatChart(await fetchEurostatData(this.value), "tourismNightsChart", tourismNightsChart);
+                }
+            });
+
+             establishmentsCompareEl.addEventListener('keydown', async function (event) {
+                 if (event.key === 'Enter') {
+                     establishmentsCompareChart = renderEurostatChart(await fetchEurostatData(this.value), "establishmentsCompareChart", establishmentsCompareChart);
+                 }
+             });
+
+             occupancyRateCompareEl.addEventListener('keydown', async function (event) {
+                 if (event.key === 'Enter') {
+                     occupancyRateCompareChart = renderEurostatChart(await fetchEurostatData(this.value), "occupancyRateCompareChart", occupancyRateCompareChart);
+                 }
+             });
+         });
+
         (adsbygoogle = window.adsbygoogle || []).push({});
         (adsbygoogle = window.adsbygoogle || []).push({});
     </script>

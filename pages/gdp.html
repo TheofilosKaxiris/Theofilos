@@ -24,11 +24,11 @@
 </head>
 <body>
     <header class="bg-primary text-white py-3 mb-4">
-        <h1 class="text-center">Greece GDP</h1>
+        <h1 class="text-center">Charts from Eurostat data</h1>
         <nav class="text-center">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-white" href="../index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="greece-gdp.html">Greece GDP</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="gdp.html">Greece GDP</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="tourism.html">Tourism</a></li>
             </ul>
         </nav>
@@ -42,11 +42,20 @@
                     data-ad-slot="1234567890"></ins>
             </div>
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
-                <section id="economy" class="card w-100 my-3">
-                    <h2>Greece GDP</h2>
-                    <div id="gdp-main-unit-label"></div>
+                <section id="gdp-growth" class="card w-100 my-3">
+                    <h2>GDP Growth Comparison</h2>
+                    <input type="text" class="form-control mb-3 gdp-url-input" placeholder="Enter Eurostat API URL for GDP Growth">
                     <canvas id="gdpGrowthChart" width="400" height="200" style="margin-top:24px;"></canvas>
-                    <a target="_blank" href="https://ec.europa.eu/eurostat/databrowser/view/tec00115/default/table?lang=en&geo=EL&time=2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024" id="link-to-eurostat">Eurostat Link</a>
+                </section>
+                <section id="gdp-per-capita" class="card w-100 my-3">
+                    <h2>GDP Per Capita Comparison</h2>
+                    <input type="text" class="form-control mb-3 gdp-url-input" placeholder="Enter Eurostat API URL for GDP Per Capita">
+                    <canvas id="gdpPerCapitaChart" width="400" height="200" style="margin-top:24px;"></canvas>
+                </section>
+                <section id="gdp-total" class="card w-100 my-3">
+                    <h2>Total GDP Comparison</h2>
+                    <input type="text" class="form-control mb-3 gdp-url-input" placeholder="Enter Eurostat API URL for Total GDP">
+                    <canvas id="gdpTotalChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
             </main>
             <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
@@ -58,7 +67,6 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/gdp-charts.js"></script>
     <script src="../js/main.js"></script>
     <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
