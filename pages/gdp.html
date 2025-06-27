@@ -44,17 +44,17 @@
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
                 <section id="gdp-growth" class="card w-100 my-3">
                     <h2>GDP Growth Comparison</h2>
-                    <input type="text" class="form-control mb-3 gdp-url-input" placeholder="Enter Eurostat API URL for GDP Growth">
+                    <input type="text" id="gdpGrowthInput" class="form-control mb-3 gdp-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00115?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=PC_CHG&lang=en">
                     <canvas id="gdpGrowthChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
                 <section id="gdp-per-capita" class="card w-100 my-3">
                     <h2>GDP Per Capita Comparison</h2>
-                    <input type="text" class="form-control mb-3 gdp-url-input" placeholder="Enter Eurostat API URL for GDP Per Capita">
+                    <input type="text" id="gdpPerCapitaInput" class="form-control mb-3 gdp-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00114?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=EUR_HAB&lang=en">
                     <canvas id="gdpPerCapitaChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
                 <section id="gdp-total" class="card w-100 my-3">
                     <h2>Total GDP Comparison</h2>
-                    <input type="text" class="form-control mb-3 gdp-url-input" placeholder="Enter Eurostat API URL for Total GDP">
+                    <input type="text" id="gdpTotalInput" class="form-control mb-3 gdp-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tec00001?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=MIO_EUR&lang=en">
                     <canvas id="gdpTotalChart" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
             </main>
@@ -67,8 +67,43 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/charts.js"></script>
     <script src="../js/main.js"></script>
     <script>
+        var gdpGrowthChart = null;
+        var gdpPerCapitaChart = null;
+        var gdpTotalChart = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            var gdpGrowthEl = document.getElementById('gdpGrowthInput');
+            var gdpPerCapitaEl = document.getElementById('gdpPerCapitaInput');
+            var gdpTotalEl = document.getElementById('gdpTotalInput');
+
+            let gdpGrowthChartData = await fetchEurostatData(gdpGrowthEl.value);
+            let gdpPerCapitaChartData = await fetchEurostatData(gdpPerCapitaEl.value);
+            let gdpTotalChartData = await fetchEurostatData(gdpTotalEl.value);
+
+            gdpGrowthChart = renderEurostatChart(gdpGrowthChartData, "gdpGrowthChart", gdpGrowthChart);
+            gdpPerCapitaChart = renderEurostatChart(gdpPerCapitaChartData, "gdpPerCapitaChart", gdpPerCapitaChart);
+            gdpTotalChart = renderEurostatChart(gdpTotalChartData, "gdpTotalChart", gdpTotalChart);
+
+            gdpGrowthEl.addEventListener('keydown', async function (event) {
+                if (event.key === 'Enter') {
+                    gdpGrowthChart = renderEurostatChart(await fetchEurostatData(this.value), "gdpGrowthChart", gdpGrowthChart);
+                }
+            });
+            gdpPerCapitaEl.addEventListener('keydown', async function (event) {
+                if (event.key === 'Enter') {
+                    gdpPerCapitaChart = renderEurostatChart(await fetchEurostatData(this.value), "gdpPerCapitaChart", gdpPerCapitaChart);
+                }
+            });
+            gdpTotalEl.addEventListener('keydown', async function (event) {
+                if (event.key === 'Enter') {
+                    gdpTotalChart = renderEurostatChart(await fetchEurostatData(this.value), "gdpTotalChart", gdpTotalChart);
+                }
+            });
+        });
+
         (adsbygoogle = window.adsbygoogle || []).push({});
         (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
