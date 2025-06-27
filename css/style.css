@@ -72,19 +72,3 @@ nav a:hover {
 .card strong {
     color: #003399;
 }
-
-#gdp-main-unit-label {
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #003399;
-}
-
-#economy-api-data {
-    margin-top: 18px;
-    background: #eaf0ff;
-    border-radius: 8px;
-    padding: 12px;
-    color: #003399;
-    font-weight: bold;
-}

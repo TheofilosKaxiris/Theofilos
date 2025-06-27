@@ -28,7 +28,7 @@
         <nav class="text-center">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-white" href="../index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="gdp.html">GDP</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="economy.html">Economy</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="tourism.html">Tourism</a></li>
             </ul>
         </nav>
@@ -43,19 +43,16 @@
             </div>
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
                 <section id="tourism-nights" class="card w-100 my-3">
-                    <h2>Nights Spent Comparison</h2>
-                    <input type="text" id="tourismNightsInput" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en">
-                    <canvas id="tourismNightsChart" width="400" height="200" style="margin-top:24px;"></canvas>
+                    <input type="text" id="input1" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en">
+                    <canvas id="chart1" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
                 <section id="establishments-compare" class="card w-100 my-3">
-                    <h2>Establishments Comparison</h2>
-                    <input type="text" id="establishmentsCompareInput" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_cap_nat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&accomunit=ESTBL&nace_r2=I551-I553&lang=en">
-                    <canvas id="establishmentsCompareChart" width="400" height="200" style="margin-top:24px;"></canvas>
+                    <input type="text" id="input2" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_cap_nat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&accomunit=ESTBL&nace_r2=I551-I553&lang=en">
+                    <canvas id="chart2" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
                 <section id="occupancy-rate-compare" class="card w-100 my-3">
-                    <h2>Occupancy Rate Comparison</h2>
-                    <input type="text" id="occupancyRateCompareInput" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_anor?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=PC&accomunit=BEDPL&hotelsize=TOTAL&lang=en">
-                    <canvas id="occupancyRateCompareChart" width="400" height="200" style="margin-top:24px;"></canvas>
+                    <input type="text" id="input3" class="form-control mb-3 tourism-url-input" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_anor?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=PC&accomunit=BEDPL&hotelsize=TOTAL&lang=en">
+                    <canvas id="chart3" width="400" height="200" style="margin-top:24px;"></canvas>
                 </section>
             </main>
             <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
@@ -70,42 +67,34 @@
     <script src="../js/charts.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        var tourismNightsChart = null;
-        var establishmentsCompareChart = null;
-        var occupancyRateCompareChart = null;
+        var chart1 = null;
+        var chart2 = null;
+        var chart3 = null;
+        window.addEventListener('DOMContentLoaded', async () => {
+            var el1 = document.getElementById('input1');
+            var el2 = document.getElementById('input2');
+            var el3 = document.getElementById('input3');
 
-         window.addEventListener('DOMContentLoaded', async () => {
+            chart1 = renderEurostatChart(await fetchEurostatData(el1.value), "chart1", chart1);
+            chart2 = renderEurostatChart(await fetchEurostatData(el2.value), "chart2", chart2);
+            chart3 = renderEurostatChart(await fetchEurostatData(el3.value), "chart3", chart3);
 
-            var tourismNightsEl = document.getElementById('tourismNightsInput');
-            var establishmentsCompareEl = document.getElementById('establishmentsCompareInput');
-            var occupancyRateCompareEl = document.getElementById('occupancyRateCompareInput');
-
-            let tourismNightsChartData = await fetchEurostatData(tourismNightsEl.value);
-            let establishmentsCompareChartData = await fetchEurostatData(establishmentsCompareEl.value);
-            let occupancyRateCompareChartData = await fetchEurostatData(occupancyRateCompareEl.value);
-
-            tourismNightsChart = renderEurostatChart(tourismNightsChartData, "tourismNightsChart", tourismNightsChart);
-            establishmentsCompareChart = renderEurostatChart(establishmentsCompareChartData, "establishmentsCompareChart", establishmentsCompareChart);
-            occupancyRateCompareChart = renderEurostatChart(occupancyRateCompareChartData, "occupancyRateCompareChart", occupancyRateCompareChart);
-
-            tourismNightsEl.addEventListener('keydown', async function (event) {
+            el1.addEventListener('keydown', async function (event) {
                 if (event.key === 'Enter') {
-                    tourismNightsChart = renderEurostatChart(await fetchEurostatData(this.value), "tourismNightsChart", tourismNightsChart);
+                    chart1 = renderEurostatChart(await fetchEurostatData(this.value), "chart1", chart1);
                 }
             });
-
-             establishmentsCompareEl.addEventListener('keydown', async function (event) {
-                 if (event.key === 'Enter') {
-                     establishmentsCompareChart = renderEurostatChart(await fetchEurostatData(this.value), "establishmentsCompareChart", establishmentsCompareChart);
-                 }
-             });
-
-             occupancyRateCompareEl.addEventListener('keydown', async function (event) {
-                 if (event.key === 'Enter') {
-                     occupancyRateCompareChart = renderEurostatChart(await fetchEurostatData(this.value), "occupancyRateCompareChart", occupancyRateCompareChart);
-                 }
-             });
-         });
+            el2.addEventListener('keydown', async function (event) {
+                if (event.key === 'Enter') {
+                    chart2 = renderEurostatChart(await fetchEurostatData(this.value), "chart2", chart2);
+                }
+            });
+            el3.addEventListener('keydown', async function (event) {
+                if (event.key === 'Enter') {
+                    chart3 = renderEurostatChart(await fetchEurostatData(this.value), "chart3", chart3);
+                }
+            });
+        });
 
         (adsbygoogle = window.adsbygoogle || []).push({});
         (adsbygoogle = window.adsbygoogle || []).push({});
