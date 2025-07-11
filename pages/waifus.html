@@ -39,24 +39,19 @@
     <script src="../js/main.js"></script>
     <script>
         document.getElementById('fetchWaifusBtn').addEventListener('click', async function() {
-            console.log('Fetching waifus...');
 
             const count = document.getElementById('waifuCount').value;
-            console.log(`Number of waifus to fetch: ${count}`);
-            const waifus = await fetchWaifus2(count);
             const gallery = document.getElementById('waifusGallery');
             gallery.innerHTML = '';
-            if (waifus && Array.isArray(waifus)) {
-                waifus.forEach(url => {
-                    const col = document.createElement('div');
-                    col.className = 'col-6 col-md-4 col-lg-3 mb-4';
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.alt = 'Waifu';
-                    img.className = 'img-fluid rounded shadow';
-                    col.appendChild(img);
-                    gallery.appendChild(col);
-                });
+            for await (const url of fetchWaifusGenerator(count)) {
+                const col = document.createElement('div');
+                col.className = 'col-6 col-md-4 col-lg-3 mb-4';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Waifu';
+                img.className = 'img-fluid rounded shadow';
+                col.appendChild(img);
+                gallery.appendChild(col);
             }
         });
     </script>

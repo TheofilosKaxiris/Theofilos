@@ -22,33 +22,10 @@ async function fetchEurostatData(eurostatUrl) {
     }
 }
 
-// Fetch waifus images from API
-async function fetchWaifus(number) {
-    try {
-        const response = await fetch(`${API_URL}/home/waifu/generator?numberOfWaifus=${number}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Username': 'basicuser',
-                'X-Password': 'z?4n$14gX_^gl69w'
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        // Expecting an array of image URLs
-        return data;
-    } catch (error) {
-        console.error('Error fetching waifus:', error);
-        return [];
-    }
-}
-
 // Fetch waifus images from url
-async function fetchWaifus2(number) {
+async function* fetchWaifusGenerator(number) {
     try {
-        const urls = [];
+    
         for (let i = 0; i < number; i++) {
             const response = await fetch(`https://api.waifu.im/search`, {
                 method: 'GET',
@@ -56,17 +33,21 @@ async function fetchWaifus2(number) {
                     'Content-Type': 'application/json',
                 }
             });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
+            
             const url = (await response.json()).images[0].url;
-            urls.push(url);
+            yield url;
+            console.log(`Waifu ${i + 1}:`, url);
+            if(i > 9){
+                await delay(200);
+            }
         }
-      
-        // Expecting an array of image URLs
-        return urls;
     } catch (error) {
         console.error('Error fetching waifus:', error);
         return [];
     }
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
