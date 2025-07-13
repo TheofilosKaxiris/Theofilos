@@ -39,7 +39,6 @@
     <script src="../js/main.js"></script>
     <script>
         document.getElementById('fetchWaifusBtn').addEventListener('click', async function() {
-
             const count = document.getElementById('waifuCount').value;
             const gallery = document.getElementById('waifusGallery');
             gallery.innerHTML = '';
@@ -50,6 +49,10 @@
                 img.src = url;
                 img.alt = 'Waifu';
                 img.className = 'img-fluid rounded shadow';
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', function() {
+                  window.open(url);
+                });
                 col.appendChild(img);
                 gallery.appendChild(col);
             }

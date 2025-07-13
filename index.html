@@ -38,7 +38,7 @@
 </head>
 <body>
     <header class="bg-primary text-white py-3 mb-4">
-        <h1 class="text-center">Eurostat Statistics and Charts</h1>
+        <h1 class="text-center">Akis Front</h1>
         <nav class="text-center">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
@@ -59,26 +59,185 @@
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
                 <section class="card w-100 my-3">
                     <div class="card-body">
-                        <h3 class="text-secondary">About Eurostat APIs</h3>
-                        <p>Eurostat provides a powerful REST API for accessing a wide range of European statistics in machine-readable formats. The API allows you to query datasets by specifying dataset codes and filters directly in the URL. Data is returned in JSON or other formats for easy integration and visualization.</p>
-                        <ul>
-                            <li>API Base URL: <code>https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/</code></li>
-                            <li>Documentation: <a href="https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started" target="_blank">Eurostat API Documentation</a></li>
-                        </ul>
-                    </div>
-                </section>
-                <section class="card w-100 my-3">
-                    <div class="card-body">
-                        <h3 class="text-secondary">Dataset Example: <code>tour_occ_ninat</code></h3>
-                        <p>The <code>tour_occ_ninat</code> dataset provides statistics on nights spent at tourist accommodations by country and other dimensions. You can filter the data using URL parameters:</p>
-                        <ul>
-                            <li><b>geo</b>: Country code (e.g., <code>DE</code> for Germany, <code>FR</code> for France)</li>
-                            <li><b>unit</b>: Unit of measurement (e.g., <code>NR</code> for number of nights)</li>
-                            <li><b>c_resid</b>: Country of residence (e.g., <code>TOTAL</code> for all residents)</li>
-                            <li><b>nace_r2</b>: Type of accommodation (e.g., <code>I551</code> for hotels)</li>
-                        </ul>
-                        <p>Example URL:</p>
-                        <code>https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&amp;geo=DE&amp;geo=EL&amp;geo=FR&amp;geo=IT&amp;unit=NR&amp;c_resid=TOTAL&amp;nace_r2=I551&amp;lang=en</code>
+                        <h3 class="text-secondary">Eurostat Datasets Overview</h3>
+                        <p>Below is a structured list of key Eurostat datasets used in this site, grouped by category. Click a section to expand or collapse its datasets.</p>
+                        <div class="accordion" id="datasetsAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTourism">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTourism" aria-expanded="true" aria-controls="collapseTourism">
+                                        Tourism
+                                    </button>
+                                </h2>
+                                <div id="collapseTourism" class="accordion-collapse collapse show" aria-labelledby="headingTourism" data-bs-parent="#datasetsAccordion">
+                                    <div class="accordion-body p-0">
+                                        <table class="table table-bordered table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Dataset Code</th>
+                                                    <th>Description</th>
+                                                    <th>Main Filters</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en" target="_blank"><code>tour_occ_ninat</code></a>
+                                                    </td>
+                                                    <td>Nights spent at tourist accommodations by country and other dimensions.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code (e.g., DE, FR, IT, EL)<br>
+                                                        <b>unit</b>: Unit of measurement (e.g., NR = number of nights)<br>
+                                                        <b>c_resid</b>: Country of residence (e.g., TOTAL)<br>
+                                                        <b>nace_r2</b>: Type of accommodation (e.g., I551 = hotels)
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_anor?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en" target="_blank"><code>tour_occ_anor</code></a>
+                                                    </td>
+                                                    <td>Arrivals at tourist accommodation establishments by country and other dimensions.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>unit</b>: Unit of measurement<br>
+                                                        <b>c_resid</b>: Country of residence<br>
+                                                        <b>nace_r2</b>: Type of accommodation
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_arm?format=JSON&geo=DE&unit=NR&nace_r2=I551&time=2023&lang=en" target="_blank"><code>tour_occ_arm</code></a>
+                                                    </td>
+                                                    <td>Tourism accommodation rooms by type and country.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>unit</b>: Unit of measurement<br>
+                                                        <b>nace_r2</b>: Type of accommodation<br>
+                                                        <b>time</b>: Year
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_cap?format=JSON&geo=DE&unit=NR&nace_r2=I551&time=2023&lang=en" target="_blank"><code>tour_occ_cap</code></a>
+                                                    </td>
+                                                    <td>Tourism accommodation capacity by type and country.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>unit</b>: Unit of measurement<br>
+                                                        <b>nace_r2</b>: Type of accommodation<br>
+                                                        <b>time</b>: Year
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_tour?format=JSON&geo=DE&unit=NR&purpose=HOLIDAY&c_resid=TOTAL&time=2023&lang=en" target="_blank"><code>tour_occ_tour</code></a>
+                                                    </td>
+                                                    <td>Tourism trips by destination, purpose, and country of residence.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>unit</b>: Unit of measurement<br>
+                                                        <b>purpose</b>: Purpose of trip<br>
+                                                        <b>c_resid</b>: Country of residence<br>
+                                                        <b>time</b>: Year
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_dem_tttot?format=JSON&geo=DE&unit=NR&c_resid=TOTAL&time=2023&lang=en" target="_blank"><code>tour_dem_tttot</code></a>
+                                                    </td>
+                                                    <td>Tourism demand: total trips by country of residence and destination.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>unit</b>: Unit of measurement<br>
+                                                        <b>c_resid</b>: Country of residence<br>
+                                                        <b>time</b>: Year
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingEconomy">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEconomy" aria-expanded="false" aria-controls="collapseEconomy">
+                                        Economy
+                                    </button>
+                                </h2>
+                                <div id="collapseEconomy" class="accordion-collapse collapse" aria-labelledby="headingEconomy" data-bs-parent="#datasetsAccordion">
+                                    <div class="accordion-body p-0">
+                                        <table class="table table-bordered table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Dataset Code</th>
+                                                    <th>Description</th>
+                                                    <th>Main Filters</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_gdp?format=JSON&geo=DE&unit=CP_MEUR&na_item=B1GQ&time=2023&lang=en" target="_blank"><code>nama_10_gdp</code></a>
+                                                    </td>
+                                                    <td>Gross Domestic Product (GDP) and main aggregates by country and year.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>unit</b>: Unit of measurement<br>
+                                                        <b>na_item</b>: National accounts item (e.g., B1GQ = GDP)<br>
+                                                        <b>time</b>: Year
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_midx?format=JSON&geo=DE&coicop=CP01&time=2023&lang=en" target="_blank"><code>prc_hicp_midx</code></a>
+                                                    </td>
+                                                    <td>Harmonised Index of Consumer Prices (HICP) by country and product group.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>coicop</b>: Product group<br>
+                                                        <b>time</b>: Year/Month
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingEmployment">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEmployment" aria-expanded="false" aria-controls="collapseEmployment">
+                                        Employment
+                                    </button>
+                                </h2>
+                                <div id="collapseEmployment" class="accordion-collapse collapse" aria-labelledby="headingEmployment" data-bs-parent="#datasetsAccordion">
+                                    <div class="accordion-body p-0">
+                                        <table class="table table-bordered table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Dataset Code</th>
+                                                    <th>Description</th>
+                                                    <th>Main Filters</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsa_egan?format=JSON&geo=DE&sex=M&age=Y15-24&time=2023&lang=en" target="_blank"><code>lfsa_egan</code></a>
+                                                    </td>
+                                                    <td>Employment by age, sex, and country.</td>
+                                                    <td>
+                                                        <b>geo</b>: Country code<br>
+                                                        <b>sex</b>: Gender (M, F, T)<br>
+                                                        <b>age</b>: Age group (e.g., Y15-24)<br>
+                                                        <b>time</b>: Year
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3">For more datasets and details, visit the <a href="https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started" target="_blank">Eurostat API Documentation</a>.</p>
                     </div>
                 </section>
                 <section class="card w-100 my-3">
@@ -114,9 +273,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         var eurostatUrlChart = null;
         window.addEventListener('DOMContentLoaded', async () => {
+
+            var data = await fetchEurostatDatasets ();
 
             var eurostatUrlEl = document.getElementById('eurostatUrlInput');
             let eurostatUrlData = await fetchEurostatData(eurostatUrlEl.value);
