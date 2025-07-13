@@ -7,18 +7,18 @@
     <title>Eurostat Statistics and Charts</title>
     <meta name="description" content="Interactive charts and statistics from Eurostat. Visualize European economic and tourism data with up-to-date charts and easy-to-use tools.">
     <meta name="keywords" content="Eurostat, European statistics, charts, data visualization, economy, tourism, Europe, statistics API">
-    <link rel="canonical" href="https://interestingeurostats.online/index.html">
+    <link rel="canonical" href="https://theofiloskaxiris.online/index.html">
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content="Eurostat Statistics and Charts">
     <meta property="og:description" content="Interactive charts and statistics from Eurostat. Visualize European economic and tourism data with up-to-date charts and easy-to-use tools.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://interestingeurostats.online/index.html">
-    <meta property="og:image" content="https://interestingeurostats.online/favicon/android-chrome-512x512.png">
+    <meta property="og:url" content="https://theofiloskaxiris.online/index.html">
+    <meta property="og:image" content="https://theofiloskaxiris.online/favicon/android-chrome-512x512.png">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Eurostat Statistics and Charts">
     <meta name="twitter:description" content="Interactive charts and statistics from Eurostat. Visualize European economic and tourism data with up-to-date charts and easy-to-use tools.">
-    <meta name="twitter:image" content="https://interestingeurostats.online/favicon/android-chrome-512x512.png">
+    <meta name="twitter:image" content="https://theofiloskaxiris.online/favicon/android-chrome-512x512.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
@@ -38,262 +38,61 @@
 </head>
 <body>
     <header class="bg-primary text-white py-3 mb-4">
-        <h1 class="text-center">Akis Front</h1>
+        <h1 class="text-center">Theofilos Kaxiris</h1>
         <nav class="text-center">
             <ul class="nav justify-content-center">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="pages/economy.html">Economy</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="pages/tourism.html">Tourism</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="eurostatDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Euro statistics
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="eurostatDropdown">
+                        <li><a class="dropdown-item" href="pages/eurostats/eurostats.html">Overview</a></li>
+                        <li><a class="dropdown-item" href="pages/eurostats/economy.html">Economy</a></li>
+                        <li><a class="dropdown-item" href="pages/eurostats/tourism.html">Tourism</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item"><a class="nav-link text-white" href="pages/waifus.html">Waifus</a></li>
             </ul>
         </nav>
     </header>
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
-                <ins class="adsbygoogle"
-                    style="display:block;width:160px;height:600px"
-                    data-ad-client="ca-pub-6474686113446159"
-                    data-ad-slot="1234567890"></ins>
-            </div>
+        <div class="row justify-content-center">
             <main class="col-12 col-lg-8 d-flex flex-column align-items-center">
                 <section class="card w-100 my-3">
                     <div class="card-body">
-                        <h3 class="text-secondary">Eurostat Datasets Overview</h3>
-                        <p>Below is a structured list of key Eurostat datasets used in this site, grouped by category. Click a section to expand or collapse its datasets.</p>
-                        <div class="accordion" id="datasetsAccordion">
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingTourism">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTourism" aria-expanded="true" aria-controls="collapseTourism">
-                                        Tourism
-                                    </button>
-                                </h2>
-                                <div id="collapseTourism" class="accordion-collapse collapse show" aria-labelledby="headingTourism" data-bs-parent="#datasetsAccordion">
-                                    <div class="accordion-body p-0">
-                                        <table class="table table-bordered table-striped mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Dataset Code</th>
-                                                    <th>Description</th>
-                                                    <th>Main Filters</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en" target="_blank"><code>tour_occ_ninat</code></a>
-                                                    </td>
-                                                    <td>Nights spent at tourist accommodations by country and other dimensions.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code (e.g., DE, FR, IT, EL)<br>
-                                                        <b>unit</b>: Unit of measurement (e.g., NR = number of nights)<br>
-                                                        <b>c_resid</b>: Country of residence (e.g., TOTAL)<br>
-                                                        <b>nace_r2</b>: Type of accommodation (e.g., I551 = hotels)
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_anor?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en" target="_blank"><code>tour_occ_anor</code></a>
-                                                    </td>
-                                                    <td>Arrivals at tourist accommodation establishments by country and other dimensions.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>unit</b>: Unit of measurement<br>
-                                                        <b>c_resid</b>: Country of residence<br>
-                                                        <b>nace_r2</b>: Type of accommodation
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_arm?format=JSON&geo=DE&unit=NR&nace_r2=I551&time=2023&lang=en" target="_blank"><code>tour_occ_arm</code></a>
-                                                    </td>
-                                                    <td>Tourism accommodation rooms by type and country.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>unit</b>: Unit of measurement<br>
-                                                        <b>nace_r2</b>: Type of accommodation<br>
-                                                        <b>time</b>: Year
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_cap?format=JSON&geo=DE&unit=NR&nace_r2=I551&time=2023&lang=en" target="_blank"><code>tour_occ_cap</code></a>
-                                                    </td>
-                                                    <td>Tourism accommodation capacity by type and country.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>unit</b>: Unit of measurement<br>
-                                                        <b>nace_r2</b>: Type of accommodation<br>
-                                                        <b>time</b>: Year
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_tour?format=JSON&geo=DE&unit=NR&purpose=HOLIDAY&c_resid=TOTAL&time=2023&lang=en" target="_blank"><code>tour_occ_tour</code></a>
-                                                    </td>
-                                                    <td>Tourism trips by destination, purpose, and country of residence.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>unit</b>: Unit of measurement<br>
-                                                        <b>purpose</b>: Purpose of trip<br>
-                                                        <b>c_resid</b>: Country of residence<br>
-                                                        <b>time</b>: Year
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_dem_tttot?format=JSON&geo=DE&unit=NR&c_resid=TOTAL&time=2023&lang=en" target="_blank"><code>tour_dem_tttot</code></a>
-                                                    </td>
-                                                    <td>Tourism demand: total trips by country of residence and destination.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>unit</b>: Unit of measurement<br>
-                                                        <b>c_resid</b>: Country of residence<br>
-                                                        <b>time</b>: Year
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingEconomy">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEconomy" aria-expanded="false" aria-controls="collapseEconomy">
-                                        Economy
-                                    </button>
-                                </h2>
-                                <div id="collapseEconomy" class="accordion-collapse collapse" aria-labelledby="headingEconomy" data-bs-parent="#datasetsAccordion">
-                                    <div class="accordion-body p-0">
-                                        <table class="table table-bordered table-striped mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Dataset Code</th>
-                                                    <th>Description</th>
-                                                    <th>Main Filters</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10_gdp?format=JSON&geo=DE&unit=CP_MEUR&na_item=B1GQ&time=2023&lang=en" target="_blank"><code>nama_10_gdp</code></a>
-                                                    </td>
-                                                    <td>Gross Domestic Product (GDP) and main aggregates by country and year.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>unit</b>: Unit of measurement<br>
-                                                        <b>na_item</b>: National accounts item (e.g., B1GQ = GDP)<br>
-                                                        <b>time</b>: Year
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_midx?format=JSON&geo=DE&coicop=CP01&time=2023&lang=en" target="_blank"><code>prc_hicp_midx</code></a>
-                                                    </td>
-                                                    <td>Harmonised Index of Consumer Prices (HICP) by country and product group.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>coicop</b>: Product group<br>
-                                                        <b>time</b>: Year/Month
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="headingEmployment">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEmployment" aria-expanded="false" aria-controls="collapseEmployment">
-                                        Employment
-                                    </button>
-                                </h2>
-                                <div id="collapseEmployment" class="accordion-collapse collapse" aria-labelledby="headingEmployment" data-bs-parent="#datasetsAccordion">
-                                    <div class="accordion-body p-0">
-                                        <table class="table table-bordered table-striped mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Dataset Code</th>
-                                                    <th>Description</th>
-                                                    <th>Main Filters</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <a href="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsa_egan?format=JSON&geo=DE&sex=M&age=Y15-24&time=2023&lang=en" target="_blank"><code>lfsa_egan</code></a>
-                                                    </td>
-                                                    <td>Employment by age, sex, and country.</td>
-                                                    <td>
-                                                        <b>geo</b>: Country code<br>
-                                                        <b>sex</b>: Gender (M, F, T)<br>
-                                                        <b>age</b>: Age group (e.g., Y15-24)<br>
-                                                        <b>time</b>: Year
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mt-3">For more datasets and details, visit the <a href="https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started" target="_blank">Eurostat API Documentation</a>.</p>
+                        <h2 class="text-primary mb-3">About Me</h2>
+                        <p>Hello! I'm Theofilos Kaxiris, a passionate software engineer with a strong background in computer science and hands-on experience in the tech industry.</p>
                     </div>
                 </section>
                 <section class="card w-100 my-3">
                     <div class="card-body">
-                        <p class="mb-2">Enter a Eurostat API URL below to fetch and display interactive charts based on the latest European statistics.</p>
-                        <h2 class="text-primary">Eurostat API URL</h2>
-                        <input type="text" id="eurostatUrlInput" class="form-control mb-3" value="https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/tour_occ_ninat?format=JSON&geo=DE&geo=EL&geo=FR&geo=IT&unit=NR&c_resid=TOTAL&nace_r2=I551&lang=en">
-                        <canvas id="genericEurostatChart" width="400" height="200" class="my-3"></canvas>
-                        <p class="mt-3">After entering a valid Eurostat API URL above, the chart will update to visualize the data you requested. You can explore different datasets by changing the URL.</p>
-                    </div>
-                </section>
-                <section class="card w-100 my-3">
-                    <div class="card-body">
-                        <h3 class="text-secondary">How to Use Filters in Eurostat URLs</h3>
-                        <p>To customize your data request, add filter parameters to the API URL. You can specify multiple values for a filter by repeating the parameter (e.g., <code>&geo=DE&geo=FR</code> for Germany and France). Common filters include:</p>
+                        <h3 class="text-secondary mb-3">Professional Experience</h3>
                         <ul>
-                            <li><b>time</b>: Year or period (e.g., <code>time=2023</code>)</li>
-                            <li><b>sex</b>: Gender (e.g., <code>sex=M</code> for male, <code>sex=F</code> for female)</li>
-                            <li><b>age</b>: Age group (e.g., <code>age=Y15-24</code>)</li>
+                            <li><b>Company A</b> – Software Engineer (Year-Year): Developed scalable web applications and contributed to team projects using modern JavaScript frameworks.</li>
+                            <li><b>Company B</b> – Backend Developer (Year-Year): Designed and maintained RESTful APIs, optimized database queries, and improved system reliability.</li>
+                            <li><b>Company C</b> – Full Stack Developer (Year-Year): Led full-stack development for client projects, integrating front-end and back-end technologies for seamless user experiences.</li>
                         </ul>
-                        <p>Combine filters to refine your query and get exactly the data you need for your analysis or visualization.</p>
+                    </div>
+                </section>
+                <section class="card w-100 my-3">
+                    <div class="card-body">
+                        <h3 class="text-secondary mb-3">Education</h3>
+                        <p>I hold a <b>Bachelor's degree in Computer Science</b>, where I gained a solid foundation in algorithms, data structures, software engineering, and system design.</p>
+                    </div>
+                </section>
+                <section class="card w-100 my-3">
+                    <div class="card-body">
+                        <h3 class="text-secondary mb-3">Other Details</h3>
+                        <ul>
+                            <li><b>English Skills:</b> Excellent speaking and writing proficiency.</li>
+                            <li><b>Military Obligations:</b> Successfully fulfilled all required military service.</li>
+                        </ul>
                     </div>
                 </section>
             </main>
-            <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
-                <ins class="adsbygoogle"
-                    style="display:block;width:160px;height:600px"
-                    data-ad-client="ca-pub-6474686113446159"
-                    data-ad-slot="1234567890"></ins>
-            </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        var eurostatUrlChart = null;
-        window.addEventListener('DOMContentLoaded', async () => {
-
-            var data = await fetchEurostatDatasets ();
-
-            var eurostatUrlEl = document.getElementById('eurostatUrlInput');
-            let eurostatUrlData = await fetchEurostatData(eurostatUrlEl.value);
-
-            eurostatUrlChart = renderEurostatChart(eurostatUrlData, "genericEurostatChart", eurostatUrlChart);
-
-            eurostatUrlEl.addEventListener('keydown', async function (event) {
-                if (event.key === 'Enter') {
-                    eurostatUrlChart = renderEurostatChart(await fetchEurostatData(this.value), "genericEurostatChart", eurostatUrlChart);
-                }
-            });
-        });
-
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
 </body>
 </html>

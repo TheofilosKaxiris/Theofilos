@@ -7,25 +7,25 @@
     <title>Eurostat Tourism Statistics</title>
     <meta name="description" content="Discover interactive charts and statistics about European tourism from Eurostat. Visualize tourism trends and data for Europe.">
     <meta name="keywords" content="Eurostat, European tourism, tourism statistics, charts, data visualization, Europe, tourism, statistics API">
-    <link rel="canonical" href="https://interestingeurostats.online/pages/tourism.html">
+    <link rel="canonical" href="https://theofiloskaxiris.online/pages/eurostats/tourism.html">
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content="Eurostat Tourism Statistics">
     <meta property="og:description" content="Discover interactive charts and statistics about European tourism from Eurostat. Visualize tourism trends and data for Europe.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://interestingeurostats.online/pages/tourism.html">
-    <meta property="og:image" content="https://interestingeurostats.online/favicon/android-chrome-512x512.png">
+    <meta property="og:url" content="https://theofiloskaxiris.online/pages/eurostats/tourism.html">
+    <meta property="og:image" content="https://theofiloskaxiris.online/favicon/android-chrome-512x512.png">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Eurostat Tourism Statistics">
     <meta name="twitter:description" content="Discover interactive charts and statistics about European tourism from Eurostat. Visualize tourism trends and data for Europe.">
-    <meta name="twitter:image" content="https://interestingeurostats.online/favicon/android-chrome-512x512.png">
+    <meta name="twitter:image" content="https://theofiloskaxiris.online/favicon/android-chrome-512x512.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
-    <link rel="manifest" href="../favicon/site.webmanifest">
-    <link rel="shortcut icon" href="../favicon/favicon.ico">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../favicon/favicon-16x16.png">
+    <link rel="manifest" href="../../favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../../favicon/favicon.ico">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-599PBS1V4S"></script>
     <script>
@@ -41,10 +41,18 @@
         <h1 class="text-center">Eurostat Statistics and Charts</h1>
         <nav class="text-center">
             <ul class="nav justify-content-center">
-                <li class="nav-item"><a class="nav-link text-white" href="../index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="economy.html">Economy</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="tourism.html">Tourism</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="waifus.html">Waifus</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="../../index.html">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="eurostatDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Euro statistics
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="eurostatDropdown">
+                        <li><a class="dropdown-item" href="eurostats.html">Overview</a></li>
+                        <li><a class="dropdown-item" href="economy.html">Economy</a></li>
+                        <li><a class="dropdown-item" href="tourism.html">Tourism</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link text-white" href="../waifus.html">Waifus</a></li>
             </ul>
         </nav>
     </header>
@@ -79,8 +87,9 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/charts.js"></script>
-    <script src="../js/main.js"></script>
+    <script src="../../js/charts.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         var chart1 = null;
         var chart2 = null;
