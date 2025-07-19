@@ -39,7 +39,7 @@ async function* fetchWaifusGenerator(number) {
             yield url;
             console.log(`Waifu ${i + 1}:`, url);
             if(i > 9){
-                await delay(200);
+                await delay(500);
             }
         }
     } catch (error) {
