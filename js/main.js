@@ -38,7 +38,7 @@ async function* fetchWaifusGenerator(number) {
             const url = (await response.json()).images[0].url;
             yield url;
             console.log(`Waifu ${i + 1}:`, url);
-            if(i > 9){
+            if(i > 8){
                 await delay(500);
             }
         }
