@@ -41,6 +41,7 @@ async function* fetchWaifusGenerator(number) {
             if(i > 8){
                 await delay(200);
             }
+            await delay(100);
         }
     } catch (error) {
         console.error('Error fetching waifus:', error);
