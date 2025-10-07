@@ -1,0 +1,25 @@
+name: Ping Company Collection API
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # Every 10 minutes
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    name: Ping API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute HTTP GET
+        run: |
+          set -e
+          URL="https://companycollection-chduerfpevb0h9ga.westeurope-01.azurewebsites.net/api/home"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          echo "Response status: $STATUS"
+          if [ "$STATUS" -ge 400 ]; then
+            echo "Request failed"
+            exit 1
+          fi
+
+      - name: Show timestamp
+        run: echo "Ping sent at $(date -u) UTC"
