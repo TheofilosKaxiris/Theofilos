@@ -4,14 +4,15 @@
 
 .DESCRIPTION
     Calls the waifu.im API to retrieve a SFW (by default) image, downloads it to disk,
-    and applies it as the desktop wallpaper. Supports orientation and tag filters,
+    and applies it as the desktop wallpaper. Supports optional orientation and tag filters,
     and common Windows wallpaper styles (Fill, Fit, Stretch, Center, Tile, Span).
 
 .PARAMETER NSFW
     Include NSFW images. Off by default.
 
 .PARAMETER Orientation
-    Preferred image orientation: LANDSCAPE (default), PORTRAIT, or SQUARE.
+    Preferred image orientation: LANDSCAPE, PORTRAIT, or SQUARE. If omitted, no
+    orientation filter is sent to the API.
 
 .PARAMETER Tags
     One or more waifu.im included tags (e.g., waifu, maid). Comma-joined for API.
@@ -23,7 +24,7 @@
     Where to save the downloaded image. Default is a unique file in the TEMP folder.
 
 .EXAMPLE
-    # Set a random safe-for-work landscape wallpaper with Fill style
+    # Set a random safe-for-work wallpaper with Fill style
     # .\Set-WaifuWallpaper.ps1
 
 .EXAMPLE
@@ -39,7 +40,7 @@
 Param(
     [switch] $NSFW,
     [ValidateSet('LANDSCAPE','PORTRAIT','SQUARE')]
-    [string] $Orientation = 'LANDSCAPE',
+    [string] $Orientation,
 
     [string[]] $Tags = @(),
 
@@ -90,9 +91,12 @@ function New-WaifuApiUri {
     )
     $base = 'https://api.waifu.im/search'
     $params = @{
-        'is_nsfw'    = $IsNsfw.ToString().ToLower()
-        'orientation' = $Orientation
+        'is_nsfw' = $IsNsfw.ToString().ToLower()
     }
+    if (-not [string]::IsNullOrWhiteSpace($Orientation)) {
+        $params['orientation'] = $Orientation
+    }
+
     $query = ($params.GetEnumerator() | ForEach-Object { "{0}={1}" -f [System.Net.WebUtility]::UrlEncode($_.Key), [System.Net.WebUtility]::UrlEncode([string]$_.Value) }) -join '&'
 
     if ($Tags -and $Tags.Count -gt 0) {
