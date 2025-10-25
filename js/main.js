@@ -27,7 +27,7 @@ async function* fetchWaifusGenerator(number) {
     try {
     
         for (let i = 0; i < number; i++) {
-            const response = await fetch(`https://api.waifu.im/search`, {
+            const response = await fetch(`https://api.waifu.im/search?orientation=LANDSCAPE`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
