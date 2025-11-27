@@ -1,0 +1,44 @@
+name: Ping Endpoint
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # Every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: lumberjackbarbershopgr Ping
+    runs-on: ubuntu-latest
+    env:
+      RUN_PING: "unset"
+    steps:
+      - name: Determine Athens time window
+        run: |
+          HOUR=$(TZ=Europe/Athens date +%H)
+          echo "Current Athens hour: $HOUR"
+          if [ "$HOUR" -lt 8 ]; then
+            echo "RUN_PING=false" >> $GITHUB_ENV
+            echo "Before 08:00 Athens time; will skip ping."
+          else
+            echo "RUN_PING=true" >> $GITHUB_ENV
+          fi
+
+      - name: Skip (outside allowed hours)
+        if: env.RUN_PING != 'true'
+        run: echo "Ping skipped due to time window (00:00-07:59 Athens)."
+
+      - name: Call endpoint
+        if: env.RUN_PING == 'true'
+        run: |
+          URL="https://lumberjackbarbershopgr.com/Home/Services"
+          echo "Pinging $URL"
+          http_code=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          echo "HTTP $http_code"
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 400 ]; then
+            echo "Request failed"
+            exit 1
+          fi
+
+      - name: Show timestamp
+        if: env.RUN_PING == 'true'
+        run: echo "Ping sent at $(date -u) UTC (Athens hour $(TZ=Europe/Athens date +%H))"
