@@ -286,8 +286,6 @@
         var eurostatUrlChart = null;
         window.addEventListener('DOMContentLoaded', async () => {
 
-            var data = await fetchEurostatDatasets ();
-
             var eurostatUrlEl = document.getElementById('eurostatUrlInput');
             let eurostatUrlData = await fetchEurostatData(eurostatUrlEl.value);
 
