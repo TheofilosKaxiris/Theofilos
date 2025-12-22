@@ -1,5 +1,3 @@
-const API_URL = 'https://eurostat-akis-a0dgcbhcemhzdghq.westeurope-01.azurewebsites.net';
-
 async function fetchEurostatData(eurostatUrl) {
     try {
         const response = await fetch(eurostatUrl, { method: 'GET' });
@@ -85,27 +83,4 @@ async function* fetchWaifusGenerator(number) {
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Fetch Eurostat datasets from custom backend endpoint
-async function fetchEurostatDatasets() {
-    try {
-        const response = await fetch(`${API_URL}/home/eurostat-datasets`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Username': 'basicuser',
-                'X-Password': 'z?4n$14gX_^gl69w'
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log('Eurostat datasets:', data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching Eurostat datasets:', error);
-        return [];
-    }
 }
