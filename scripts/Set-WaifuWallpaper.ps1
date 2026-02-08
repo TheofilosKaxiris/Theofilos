@@ -89,7 +89,7 @@ function New-WaifuApiUri {
         [string] $Orientation,
         [string[]] $Tags
     )
-    $base = 'https://api.waifu.im/search'
+    $base = 'https://api.waifu.im/images'
     $params = @{
         'is_nsfw' = $IsNsfw.ToString().ToLower()
     }
@@ -182,11 +182,11 @@ try {
 
     $response = Invoke-JsonRequest -Uri $uri -TimeoutSec 20
 
-    if (-not $response -or -not $response.images -or $response.images.Count -eq 0) {
+    if (-not $response -or -not $response.items -or $response.items.Count -eq 0) {
         throw 'waifu.im returned no images.'
     }
 
-    $imageUrl = [string]$response.images[0].url
+    $imageUrl = [string]$response.items[0].url
     Write-Verbose "Image: $imageUrl"
 
     $dest = Resolve-OutputPath -OutputPath $OutputPath -ImageUrl $imageUrl
