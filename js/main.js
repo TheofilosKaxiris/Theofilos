@@ -67,7 +67,7 @@ async function* fetchWaifusGenerator(number) {
             });
             if (!response.ok) throw new Error('Network response was not ok');
             
-            const url = (await response.json()).images[0].url;
+            const url = (await response.json()).items[0].url;
             yield url;
             console.log(`Waifu ${i + 1}:`, url);
             if(i > 8){
