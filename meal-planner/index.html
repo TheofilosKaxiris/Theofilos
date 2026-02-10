@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Πλάνο Γευμάτων — Εβδομαδιαίο Πρόγραμμα & Λίστα Αγορών</title>
+<link rel="stylesheet" href="style.css">
+<link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+<link rel="manifest" href="../favicon/site.webmanifest">
+<link rel="shortcut icon" href="../favicon/favicon.ico">
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <header id="header">
+    <div class="header-left">
+      <button id="sidebar-toggle" class="icon-btn" title="Εμφάνιση/Απόκρυψη συνταγών">☰</button>
+      <h1>🍽️ Πλάνο Γευμάτων</h1>
+    </div>
+    <div class="header-center">
+      <label class="servings-label">Μαγειρεύω για
+        <select id="servings-select">
+          <option value="1">1 άτομο</option>
+          <option value="2" selected>2 άτομα</option>
+          <option value="3">3 άτομα</option>
+          <option value="4">4 άτομα</option>
+          <option value="5">5 άτομα</option>
+          <option value="6">6 άτομα</option>
+        </select>
+      </label>
+    </div>
+    <div class="header-right">
+      <div class="plan-controls">
+        <select id="plan-select" title="Φόρτωση αποθηκευμένου πλάνου"><option value="">— Τρέχον Πλάνο —</option></select>
+        <button id="save-plan-btn" class="btn btn-sm" title="Αποθήκευση πλάνου">💾 Αποθήκευση</button>
+        <button id="dup-plan-btn" class="btn btn-sm" title="Αντιγραφή πλάνου">📋</button>
+        <button id="del-plan-btn" class="btn btn-sm btn-danger" title="Διαγραφή πλάνου">🗑️</button>
+      </div>
+      <button id="grocery-toggle" class="btn btn-accent" title="Λίστα αγορών">🛒 Λίστα Αγορών</button>
+    </div>
+  </header>
+
+  <!-- Sidebar: Recipe Library -->
+  <aside id="sidebar" class="sidebar open">
+    <div class="sidebar-header">
+      <h2>📖 Συνταγές</h2>
+      <button id="add-recipe-btn" class="btn btn-accent">+ Νέα Συνταγή</button>
+    </div>
+    <input type="text" id="recipe-search" placeholder="Αναζήτηση συνταγών..." class="search-input">
+    <div id="recipe-list" class="recipe-list"></div>
+  </aside>
+
+  <!-- Main: Weekly Planner Grid -->
+  <main id="main">
+    <div class="planner-toolbar">
+      <span id="plan-info" class="plan-info"></span>
+      <div class="planner-actions">
+        <button id="surprise-btn" class="btn btn-sm">🎲 Τυχαία Επιλογή</button>
+        <button id="clear-week-btn" class="btn btn-sm btn-danger">✕ Καθαρισμός Εβδομάδας</button>
+      </div>
+    </div>
+    <div id="planner-grid" class="planner-grid">
+      <!-- Rendered by JS -->
+    </div>
+  </main>
+
+  <!-- Panel: Grocery List -->
+  <aside id="grocery-panel" class="grocery-panel">
+    <div class="grocery-header">
+      <h2>🛒 Λίστα Αγορών</h2>
+      <div class="grocery-actions">
+        <button id="uncheck-all-btn" class="btn btn-sm">↩ Αποεπιλογή</button>
+        <button id="copy-list-btn" class="btn btn-sm">📋 Αντιγραφή</button>
+        <button id="print-list-btn" class="btn btn-sm">🖨️ Εκτύπωση</button>
+        <button id="grocery-close" class="btn btn-sm icon-btn">✕</button>
+      </div>
+    </div>
+    <div id="grocery-list" class="grocery-list"></div>
+  </aside>
+
+  <!-- Overlay for mobile panels -->
+  <div id="overlay" class="overlay hidden"></div>
+
+  <!-- Recipe Modal -->
+  <div id="recipe-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Προσθήκη Συνταγής</h2>
+        <button id="modal-close" class="icon-btn">✕</button>
+      </div>
+      <form id="recipe-form" class="recipe-form">
+        <div class="form-row">
+          <label>Όνομα Συνταγής *<input type="text" id="recipe-name" required></label>
+        </div>
+        <div class="form-row form-row-half">
+          <label>Κατηγορία
+            <select id="recipe-category">
+              <option value="breakfast">🌅 Πρωινό</option>
+              <option value="lunch">☀️ Μεσημεριανό</option>
+              <option value="dinner">🌙 Βραδινό</option>
+              <option value="snack">🍿 Σνακ</option>
+            </select>
+          </label>
+          <label>Μερίδες<input type="number" id="recipe-servings" min="1" max="20" value="2"></label>
+        </div>
+        <div class="form-section">
+          <div class="form-section-header">
+            <h3>Υλικά</h3>
+            <button type="button" id="add-ingredient-btn" class="btn btn-sm">+ Προσθήκη</button>
+          </div>
+          <div id="ingredients-list" class="ingredients-list"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="modal-cancel" class="btn">Ακύρωση</button>
+          <button type="submit" class="btn btn-accent">Αποθήκευση Συνταγής</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Slot Popup -->
+  <div id="slot-popup" class="slot-popup hidden">
+    <div id="slot-popup-content"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
