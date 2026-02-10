@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heatmap Calendar — Track Anything</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="GitHub-style activity heatmap for tracking any daily habit or metric">
+  <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+  <link rel="manifest" href="../favicon/site.webmanifest">
+  <link rel="shortcut icon" href="../favicon/favicon.ico">
+</head>
+<body>
+  <header class="app-header">
+    <h1>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="vertical-align:middle">
+        <rect x="1" y="1" width="5" height="5" rx="1" fill="#39d353"/>
+        <rect x="7.5" y="1" width="5" height="5" rx="1" fill="#26a641"/>
+        <rect x="14" y="1" width="5" height="5" rx="1" fill="#006d32"/>
+        <rect x="1" y="7.5" width="5" height="5" rx="1" fill="#0e4429"/>
+        <rect x="7.5" y="7.5" width="5" height="5" rx="1" fill="#39d353"/>
+        <rect x="14" y="7.5" width="5" height="5" rx="1" fill="#26a641"/>
+        <rect x="1" y="14" width="5" height="5" rx="1" fill="#006d32"/>
+        <rect x="7.5" y="14" width="5" height="5" rx="1" fill="#39d353"/>
+        <rect x="14" y="14" width="5" height="5" rx="1" fill="#0e4429"/>
+      </svg>
+      Heatmap Calendar
+    </h1>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="App.showReminderSettings()" title="Reminder settings">🔔</button>
+      <button class="btn-icon" id="theme-toggle" onclick="App.toggleTheme()" title="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <main class="app-container">
+    <div id="track-tabs-container"></div>
+    <div id="app-content"></div>
+  </main>
+
+  <script src="storage.js"></script>
+  <script src="heatmap.js"></script>
+  <script src="stats.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

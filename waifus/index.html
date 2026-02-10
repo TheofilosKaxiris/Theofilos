@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waifus Gallery</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+    <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../favicon/favicon.ico">
+</head>
+    <header>
+        <h1>Waifus Gallery</h1>
+    </header>
+    <div class="controls">
+        <div class="field">
+            <label for="waifuCount">Count</label>
+            <input type="number" id="waifuCount" value="5" min="1" max="50">
+        </div>
+        <button id="fetchWaifusBtn" class="btn">Fetch Waifus</button>
+    </div>
+    <p class="loading-text" id="loadingText">Loading waifus...</p>
+    <div class="gallery" id="waifusGallery"></div>
+    <script src="main.js"></script>
+    <script>
+        document.getElementById('fetchWaifusBtn').addEventListener('click', async function() {
+            const count = document.getElementById('waifuCount').value;
+            const gallery = document.getElementById('waifusGallery');
+            const loading = document.getElementById('loadingText');
+            gallery.innerHTML = '';
+            loading.classList.add('active');
+            let i = 0;
+            for await (const url of fetchWaifusGenerator(count)) {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.style.animationDelay = `${i * 0.06}s`;
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Waifu';
+                img.loading = 'lazy';
+                img.addEventListener('click', function() {
+                    window.open(url);
+                });
+                item.appendChild(img);
+                gallery.appendChild(item);
+                i++;
+            }
+            loading.classList.remove('active');
+        });
+    </script>
+</body>
+</html>

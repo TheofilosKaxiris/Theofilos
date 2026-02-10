@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector — Industry Comparison Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+<link rel="manifest" href="../favicon/site.webmanifest">
+<link rel="shortcut icon" href="../favicon/favicon.ico">
+</head>
+<body>
+<div id="app">
+  <!-- Top Bar -->
+  <header id="topbar">
+    <div class="topbar-left">
+      <h1 class="logo">◈ Sector</h1>
+      <div id="industry-selector" class="selector-wrap">
+        <input type="text" id="industry-search" placeholder="Search industries..." autocomplete="off">
+        <div id="industry-dropdown" class="dropdown hidden">
+          <div id="recent-industries" class="dropdown-section hidden">
+            <div class="dropdown-label">Recent</div>
+          </div>
+          <div id="all-industries" class="dropdown-section">
+            <div class="dropdown-label">All Industries</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button id="compare-toggle" class="btn" title="Compare two industries (C)">⇄ Compare</button>
+      <div id="industry-selector-b" class="selector-wrap hidden">
+        <input type="text" id="industry-search-b" placeholder="Second industry..." autocomplete="off">
+        <div id="industry-dropdown-b" class="dropdown hidden"></div>
+      </div>
+      <span id="global-stats" class="global-stats"></span>
+      <span class="data-date">Data collected: October, 2025</span>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div id="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Loading company data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div id="error-state" class="error-state hidden">
+    <div class="error-icon">⚠</div>
+    <p id="error-message"></p>
+  </div>
+
+  <!-- Main Content -->
+  <main id="main-content" class="hidden">
+    <div id="dashboard" class="dashboard-grid">
+      <!-- Stats Cards -->
+      <section id="stats-panel" class="panel">
+        <div class="panel-header"><h2>Industry Statistics</h2></div>
+        <div id="stats-cards" class="stats-cards"></div>
+        <div id="histogram-container" class="chart-container">
+          <h3>Market Cap Distribution</h3>
+          <canvas id="histogram-canvas"></canvas>
+        </div>
+        <div id="ipo-container" class="chart-container">
+          <h3>IPO Timeline</h3>
+          <canvas id="ipo-canvas"></canvas>
+        </div>
+      </section>
+
+      <!-- Treemap -->
+      <section id="treemap-panel" class="panel">
+        <div class="panel-header">
+          <h2>Market Cap Treemap</h2>
+          <div class="panel-controls">
+            <select id="treemap-color-mode">
+              <option value="scale">By Size</option>
+              <option value="exchange">By Exchange</option>
+            </select>
+          </div>
+        </div>
+        <div id="treemap-container" class="treemap-container">
+          <canvas id="treemap-canvas"></canvas>
+          <div id="treemap-tooltip" class="tooltip hidden"></div>
+        </div>
+      </section>
+
+      <!-- Company Table -->
+      <section id="table-panel" class="panel">
+        <div class="panel-header">
+          <h2>Companies</h2>
+          <div class="panel-controls">
+            <input type="text" id="table-search" placeholder="Filter by name/ticker...">
+            <button id="csv-export" class="btn btn-sm">📋 CSV</button>
+          </div>
+        </div>
+        <div id="table-container" class="table-container">
+          <table id="company-table">
+            <thead>
+              <tr>
+                <th data-sort="rank">#</th>
+                <th data-sort="ticker">Ticker</th>
+                <th data-sort="name">Name</th>
+                <th data-sort="marketCap">Market Cap</th>
+                <th data-sort="totalEmployees">Employees</th>
+                <th data-sort="state">State</th>
+                <th data-sort="primaryExchange">Exchange</th>
+              </tr>
+            </thead>
+            <tbody id="company-tbody"></tbody>
+          </table>
+        </div>
+        <div id="table-pagination" class="pagination"></div>
+      </section>
+
+      <!-- Geographic Map -->
+      <section id="map-panel" class="panel">
+        <div class="panel-header">
+          <h2>Geographic Distribution</h2>
+          <div class="panel-controls">
+            <select id="map-mode">
+              <option value="count">By Company Count</option>
+              <option value="marketCap">By Market Cap</option>
+            </select>
+          </div>
+        </div>
+        <div id="map-container" class="map-container">
+          <svg id="us-map" viewBox="0 0 960 600" preserveAspectRatio="xMidYMid meet"></svg>
+          <div id="map-tooltip" class="tooltip hidden"></div>
+          <div id="map-legend" class="map-legend"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Comparison Panel -->
+    <div id="comparison-panel" class="comparison-panel hidden">
+      <div class="comparison-header">
+        <h2 id="compare-title">Industry Comparison</h2>
+      </div>
+      <div id="comparison-stats" class="comparison-stats"></div>
+      <div class="comparison-grid">
+        <div class="comparison-col">
+          <h3 id="compare-a-title" class="compare-col-title"></h3>
+          <div id="compare-treemap-a" class="compare-treemap"><canvas id="treemap-canvas-a"></canvas></div>
+          <div id="compare-table-a" class="compare-table-wrap"></div>
+        </div>
+        <div class="comparison-col">
+          <h3 id="compare-b-title" class="compare-col-title"></h3>
+          <div id="compare-treemap-b" class="compare-treemap"><canvas id="treemap-canvas-b"></canvas></div>
+          <div id="compare-table-b" class="compare-table-wrap"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Company Detail Panel -->
+  <aside id="detail-panel" class="detail-panel hidden">
+    <div class="detail-header">
+      <button id="detail-close" class="detail-close" title="Close (Escape)">✕</button>
+      <div class="detail-nav">
+        <button id="detail-prev" class="btn btn-sm" title="Previous (←)">◀</button>
+        <button id="detail-next" class="btn btn-sm" title="Next (→)">▶</button>
+      </div>
+    </div>
+    <div id="detail-content" class="detail-content"></div>
+  </aside>
+  <div id="detail-overlay" class="detail-overlay hidden"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

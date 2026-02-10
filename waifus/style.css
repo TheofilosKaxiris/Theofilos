@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e8;
+    min-height: 100vh;
+}
+
+header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    padding: 40px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 60% 40%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 30% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+    animation: shimmer 8s ease-in-out infinite alternate;
+}
+@keyframes shimmer {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-5%, 5%); }
+}
+header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    position: relative;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, #e0e7ff, #c7d2fe, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.controls {
+    max-width: 600px;
+    margin: 36px auto 0;
+    padding: 0 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.field input {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e8;
+    width: 120px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+.btn {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 11px 28px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
+}
+.btn:active {
+    transform: translateY(0);
+}
+
+.gallery {
+    max-width: 1200px;
+    margin: 36px auto;
+    padding: 0 20px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.gallery-item {
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeUp 0.4s ease both;
+}
+.gallery-item:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 48px rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+.gallery-item img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    transition: filter 0.3s ease;
+}
+.gallery-item:hover img {
+    filter: brightness(1.08);
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading text */
+.loading-text {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+    padding: 40px 0;
+    display: none;
+}
+.loading-text.active {
+    display: block;
+}
+
+/* Empty state */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #475569;
+    padding: 60px 20px;
+    font-size: 1rem;
+}
+
+@media (max-width: 500px) {
+    .controls { flex-direction: column; align-items: stretch; }
+    .field input { width: 100%; }
+    .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .gallery-item img { height: 200px; }
+}
