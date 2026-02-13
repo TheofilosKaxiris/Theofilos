@@ -45,6 +45,7 @@ const el = {
   recipeForm: $('#recipe-form'), recipeName: $('#recipe-name'),
   recipeCategory: $('#recipe-category'), recipeServings: $('#recipe-servings'),
   addIngBtn: $('#add-ingredient-btn'), ingredientsList: $('#ingredients-list'),
+  recipeMethod: $('#recipe-method'),
   slotPopup: $('#slot-popup'), slotPopupContent: $('#slot-popup-content'),
 };
 
@@ -376,10 +377,12 @@ function showSlotPopup(recipeId, slotKey, anchor) {
   const recipe = recipes.find(r => r.id === recipeId);
   if (!recipe) return;
   const ingList = recipe.ingredients.map(i => `${i.quantity} ${i.unit} ${i.name}`).join(', ');
+  const methodHtml = recipe.method ? `<div class="sp-method"><strong>📝 Μέθοδος:</strong><br>${esc(recipe.method).replace(/\n/g,'<br>')}</div>` : '';
   el.slotPopupContent.innerHTML = `
     <div class="sp-name">${esc(recipe.name)}</div>
     <div class="sp-meta">${MEAL_ICONS[recipe.category]} ${MEAL_LABELS[recipe.category]} · ${recipe.servings} μερίδες</div>
     <div class="sp-ingredients">${esc(ingList)}</div>
+    ${methodHtml}
     <div class="sp-actions">
       <button class="btn btn-sm sp-edit" data-id="${recipe.id}">✏️ Edit</button>
       <button class="btn btn-sm btn-danger sp-remove" data-slot="${slotKey}">🗑️ Remove</button>
@@ -404,6 +407,7 @@ function openAddRecipe() {
   el.recipeName.value = '';
   el.recipeCategory.value = 'dinner';
   el.recipeServings.value = 2;
+  el.recipeMethod.value = '';
   el.ingredientsList.innerHTML = '';
   addIngredientRow();
   el.modal.classList.remove('hidden');
@@ -418,6 +422,7 @@ function openEditRecipe(id) {
   el.recipeName.value = r.name;
   el.recipeCategory.value = r.category;
   el.recipeServings.value = r.servings;
+  el.recipeMethod.value = r.method || '';
   el.ingredientsList.innerHTML = '';
   for (const ing of r.ingredients) addIngredientRow(ing);
   el.modal.classList.remove('hidden');
@@ -460,11 +465,13 @@ el.recipeForm.addEventListener('submit', e => {
   });
   if (ingredients.length === 0) { alert('Προσθέστε τουλάχιστον ένα υλικό.'); return; }
 
+  const method = el.recipeMethod.value.trim();
+
   if (editingRecipeId) {
     const r = recipes.find(r => r.id === editingRecipeId);
-    if (r) { r.name = name; r.category = el.recipeCategory.value; r.servings = +el.recipeServings.value || 2; r.ingredients = ingredients; }
+    if (r) { r.name = name; r.category = el.recipeCategory.value; r.servings = +el.recipeServings.value || 2; r.ingredients = ingredients; r.method = method; }
   } else {
-    recipes.push({ id: genId(), name, category: el.recipeCategory.value, servings: +el.recipeServings.value || 2, ingredients });
+    recipes.push({ id: genId(), name, category: el.recipeCategory.value, servings: +el.recipeServings.value || 2, ingredients, method });
   }
   save(); renderRecipeList(); renderGrid(); generateGroceryList(); closeModal();
 });
