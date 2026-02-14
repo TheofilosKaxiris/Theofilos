@@ -1,55 +1,88 @@
-async function fetchEurostatData(eurostatUrl) {
+// Eurostat Stats — Data Fetching
+// Fetches and normalizes Eurostat API responses with caching support.
+
+async function fetchEurostatData(eurostatUrl, options) {
+    options = options || {};
+    var skipCache = options.skipCache || false;
+
+    // Check cache first
+    if (!skipCache && typeof EurostatCache !== 'undefined') {
+        var cached = EurostatCache.get(eurostatUrl);
+        if (cached) {
+            cached._fromCache = true;
+            return cached;
+        }
+    }
+
     try {
-        const response = await fetch(eurostatUrl, { method: 'GET' });
+        var response = await fetch(eurostatUrl, { method: 'GET' });
+
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            var status = response.status;
+            if (status === 404) throw new Error('Dataset not found. Check the dataset code in your URL.');
+            if (status === 400) throw new Error('Bad request. Check your URL parameters (filters, country codes).');
+            if (status === 429) throw new Error('Too many requests. The Eurostat API is rate-limited — please wait a moment.');
+            throw new Error('Eurostat API returned HTTP ' + status);
         }
 
-        const eurostatData = await response.json();
-        const valueDict = eurostatData?.value || {};
-        const dimension = eurostatData?.dimension || {};
-        const size = eurostatData?.size || [];
-        const label = eurostatData?.label || '';
+        var eurostatData = await response.json();
+        var valueDict = eurostatData && eurostatData.value || {};
+        var dimension = eurostatData && eurostatData.dimension || {};
+        var size = eurostatData && eurostatData.size || [];
+        var label = eurostatData && eurostatData.label || '';
 
-        const getKeysFromIndex = (dim) => {
+        var getKeysFromIndex = function (dim) {
             if (!dim || !dim.category) return [];
-            const idx = dim.category.index;
+            var idx = dim.category.index;
             if (Array.isArray(idx)) return idx.slice();
             if (idx && typeof idx === 'object') {
                 return Object.entries(idx)
-                    .sort((a, b) => a[1] - b[1])
-                    .map(([k]) => k);
+                    .sort(function (a, b) { return a[1] - b[1]; })
+                    .map(function (e) { return e[0]; });
             }
             return [];
         };
 
-        const geoDim = dimension.geo || {};
-        const timeDim = dimension.time || {};
-        const geoKeys = getKeysFromIndex(geoDim);
-        const timeKeys = getKeysFromIndex(timeDim);
-        const geoLabels = (geoDim.category && geoDim.category.label) ? geoDim.category.label : {};
+        var geoDim = dimension.geo || {};
+        var timeDim = dimension.time || {};
+        var geoKeys = getKeysFromIndex(geoDim);
+        var timeKeys = getKeysFromIndex(timeDim);
+        var geoLabels = (geoDim.category && geoDim.category.label) ? geoDim.category.label : {};
 
-        const results = [];
-        for (const [key, val] of Object.entries(valueDict)) {
-            const flatIndex = parseInt(key, 10);
+        var results = [];
+        for (var key in valueDict) {
+            if (!valueDict.hasOwnProperty(key)) continue;
+            var val = valueDict[key];
+            var flatIndex = parseInt(key, 10);
             if (Number.isNaN(flatIndex)) continue;
-            const time = timeKeys.length ? (flatIndex % timeKeys.length) : 0;
-            const geo = timeKeys.length ? Math.floor(flatIndex / timeKeys.length) : 0;
-            const entry = {
-                geo: (geoLabels[geoKeys[geo]] ?? geoKeys[geo] ?? ''),
-                time: timeKeys[time],
-                value: String(val)
-            };
-            results.push(entry);
+            var timeIdx = timeKeys.length ? (flatIndex % timeKeys.length) : 0;
+            var geoIdx = timeKeys.length ? Math.floor(flatIndex / timeKeys.length) : 0;
+            results.push({
+                geo: geoLabels[geoKeys[geoIdx]] || geoKeys[geoIdx] || '',
+                geoCode: geoKeys[geoIdx] || '',
+                time: timeKeys[timeIdx],
+                value: String(val),
+            });
         }
 
-        const updated = typeof eurostatData.updated === 'string' ? eurostatData.updated : '';
-        const sizes = Array.isArray(size) ? size : [];
+        var updated = typeof eurostatData.updated === 'string' ? eurostatData.updated : '';
+        var sizes = Array.isArray(size) ? size : [];
 
-        const data = { updated, size: sizes, data: results, label };
-        console.log('Eurostat data:', data);
+        var data = { updated: updated, size: sizes, data: results, label: label, _fromCache: false };
+
+        // Store in cache
+        if (typeof EurostatCache !== 'undefined') {
+            EurostatCache.set(eurostatUrl, data);
+        }
+
         return data;
+
     } catch (error) {
         console.error('Error fetching Eurostat data:', error);
+        // Show user-visible error if UI is available
+        if (typeof UI !== 'undefined') {
+            UI.toast(error.message || 'Failed to fetch data from Eurostat.', 'error');
+        }
+        return null;
     }
 }

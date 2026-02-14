@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-6474686113446159">
+    <title>Eurostat Statistics</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Eurostat Statistics">
+    <meta property="og:description" content="">
+    <meta property="og:type" content="website">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Eurostat Statistics">
+    <meta name="twitter:description" content="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+    <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="shortcut icon" href="../favicon/favicon.ico">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-599PBS1V4S"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-599PBS1V4S');
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6474686113446159" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <h1 id="pageTitle">Eurostat Statistics</h1>
+        <p class="subtitle" id="pageSubtitle"></p>
+        <nav id="mainNav"></nav>
+    </header>
+    <div class="container-fluid flex-grow-1">
+        <div class="row">
+            <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
+                <ins class="adsbygoogle"
+                    style="display:block;width:160px;height:600px"
+                    data-ad-client="ca-pub-6474686113446159"
+                    data-ad-slot="1234567890"></ins>
+            </div>
+            <main id="chartsContainer" class="col-12 col-lg-8 d-flex flex-column align-items-center py-3">
+                <!-- Chart cards injected here by JS -->
+            </main>
+            <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
+                <ins class="adsbygoogle"
+                    style="display:block;width:160px;height:600px"
+                    data-ad-client="ca-pub-6474686113446159"
+                    data-ad-slot="1234567890"></ins>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            Data provided by <a href="https://ec.europa.eu/eurostat" target="_blank">Eurostat</a> &mdash;
+            <a href="https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-getting-started" target="_blank">API Documentation</a>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/cache.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ── Dashboard Engine ─────────────────────────────────
+        // Reads ?page=economy from the URL, fetches the matching JSON config,
+        // and dynamically renders all chart cards.
+
+        var chartInstances = {};
+        var chartDataStore = {};
+        var pageConfig = null;
+
+        function getPageId() {
+            var params = new URLSearchParams(window.location.search);
+            return params.get('page') || 'economy';
+        }
+
+        function loadPageConfig(pageId) {
+            var cfg = CONFIG.pageConfigs && CONFIG.pageConfigs[pageId];
+            if (!cfg) throw new Error('Page config not found: ' + pageId);
+            return cfg;
+        }
+
+        function applyMeta(cfg) {
+            document.title = cfg.title || 'Eurostat Statistics';
+            document.getElementById('pageTitle').textContent = cfg.title || '';
+            document.getElementById('pageSubtitle').textContent = cfg.subtitle || '';
+
+            var setMeta = function (sel, val) {
+                var el = document.querySelector(sel);
+                if (el && val) el.setAttribute('content', val);
+            };
+            setMeta('meta[name="description"]', cfg.metaDescription);
+            setMeta('meta[name="keywords"]', cfg.metaKeywords);
+            setMeta('meta[property="og:title"]', cfg.title);
+            setMeta('meta[property="og:description"]', cfg.metaDescription);
+            setMeta('meta[name="twitter:title"]', cfg.title);
+            setMeta('meta[name="twitter:description"]', cfg.metaDescription);
+        }
+
+        function renderNav(activeId) {
+            document.getElementById('mainNav').innerHTML = UI.navHTML(activeId);
+        }
+
+        function renderChartCards(charts) {
+            var container = document.getElementById('chartsContainer');
+            var html = '';
+            for (var i = 0; i < charts.length; i++) {
+                var c = charts[i];
+                var url = buildEurostatUrl(c.dataset, c.geo, c.filters);
+                html += UI.chartCardHTML({
+                    id: c.dataset,
+                    title: c.title,
+                    description: c.description,
+                    url: url,
+                }, i + 1);
+            }
+            container.innerHTML = html;
+        }
+
+        async function fetchChart(index) {
+            var inputEl = document.getElementById('input' + index);
+            var loadingEl = document.getElementById('loading' + index);
+            var updatedEl = document.getElementById('updated' + index);
+            if (!inputEl) return;
+
+            var url = inputEl.value;
+            loadingEl.classList.add('active');
+
+            try {
+                var data = await fetchEurostatData(url);
+                if (data) {
+                    var chartType = (pageConfig && pageConfig.charts[index - 1])
+                        ? pageConfig.charts[index - 1].chartType : 'line';
+                    chartInstances[index] = renderEurostatChart(
+                        data, 'chart' + index, chartInstances[index], { chartType: chartType }
+                    );
+                    chartDataStore[index] = data;
+
+                    // Show cache/update indicator
+                    if (updatedEl) {
+                        var txt = data.updated ? 'Data updated: ' + data.updated : '';
+                        if (data._fromCache) txt += ' (cached)';
+                        updatedEl.textContent = txt;
+                    }
+                }
+            } finally {
+                loadingEl.classList.remove('active');
+            }
+        }
+
+        function bindActions() {
+            document.addEventListener('click', function (e) {
+                var target = e.target;
+                if (!target) return;
+
+                // Fetch buttons
+                if (target.classList.contains('btn-fetch') && target.dataset.index) {
+                    fetchChart(parseInt(target.dataset.index, 10));
+                    return;
+                }
+
+                // Table toggle
+                if (target.classList.contains('btn-table-toggle') && target.dataset.index) {
+                    var idx = target.dataset.index;
+                    var tableEl = document.getElementById('table' + idx);
+                    if (!tableEl) return;
+                    if (tableEl.style.display === 'none') {
+                        tableEl.style.display = 'block';
+                        tableEl.innerHTML = UI.dataTableHTML(chartDataStore[idx]);
+                        target.textContent = 'Chart';
+                    } else {
+                        tableEl.style.display = 'none';
+                        target.textContent = 'Table';
+                    }
+                    return;
+                }
+
+                // CSV download
+                if (target.classList.contains('btn-csv') && target.dataset.index) {
+                    var d = chartDataStore[target.dataset.index];
+                    if (d) UI.downloadCSV(d, 'eurostat_' + (pageConfig ? pageConfig.id : 'data') + '_chart' + target.dataset.index);
+                    else UI.toast('No data loaded yet.', 'warning');
+                    return;
+                }
+
+                // PNG download
+                if (target.classList.contains('btn-png') && target.dataset.index) {
+                    var ci = chartInstances[target.dataset.index];
+                    if (ci) UI.downloadPNG(ci, 'eurostat_chart' + target.dataset.index);
+                    else UI.toast('No chart rendered yet.', 'warning');
+                    return;
+                }
+
+                // Share link
+                if (target.classList.contains('btn-share') && target.dataset.index) {
+                    var inp = document.getElementById('input' + target.dataset.index);
+                    if (inp) UI.copyShareUrl(inp.value);
+                    return;
+                }
+            });
+
+            // Enter key on URL inputs
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter') return;
+                var target = e.target;
+                if (target && target.tagName === 'INPUT' && target.id && target.id.startsWith('input')) {
+                    var idx = parseInt(target.id.replace('input', ''), 10);
+                    if (!isNaN(idx)) fetchChart(idx);
+                }
+            });
+        }
+
+        // ── Init ─────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', async function () {
+            var pageId = getPageId();
+            renderNav(pageId);
+
+            try {
+                pageConfig = loadPageConfig(pageId);
+                applyMeta(pageConfig);
+                renderChartCards(pageConfig.charts);
+                bindActions();
+
+                // Fetch all charts (sequentially to respect API rate limits)
+                for (var i = 1; i <= pageConfig.charts.length; i++) {
+                    await fetchChart(i);
+                }
+            } catch (err) {
+                console.error('Failed to load page config:', err);
+                UI.toast('Failed to load dashboard: ' + err.message, 'error');
+                document.getElementById('chartsContainer').innerHTML =
+                    '<div class="card w-100 my-2"><div class="card-body">' +
+                    '<h2>Page not found</h2><p>The dashboard "' + UI._esc(pageId) + '" could not be loaded. ' +
+                    '<a href="index.html">Return to Explorer</a>.</p></div></div>';
+            }
+
+            try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+            try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+        });
+    </script>
+</body>
+</html>

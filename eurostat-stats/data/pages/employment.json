@@ -1,0 +1,41 @@
+{
+    "id": "employment",
+    "title": "Eurostat Employment Statistics",
+    "subtitle": "Labour market indicators across the European Union",
+    "metaDescription": "Explore European employment and labour market statistics from Eurostat. Visualize employment, unemployment, and earnings data interactively.",
+    "metaKeywords": "Eurostat, employment, labour market, unemployment, earnings, jobs, Europe, statistics",
+    "charts": [
+        {
+            "title": "Employment (15-64)",
+            "description": "Total employment of persons aged 15-64, in thousands.",
+            "dataset": "lfsa_egan",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "sex": "T", "age": "Y15-64", "citizen": "TOTAL", "unit": "THS_PER" },
+            "chartType": "line"
+        },
+        {
+            "title": "Unemployment Rate",
+            "description": "Unemployment rate as a percentage of the active population.",
+            "dataset": "une_rt_a",
+            "geo": ["DE", "EL", "FR", "IT", "ES"],
+            "filters": { "sex": "T", "age": "Y15-74", "unit": "PC_ACT" },
+            "chartType": "line"
+        },
+        {
+            "title": "Youth Unemployment Rate (15-24)",
+            "description": "Unemployment rate for young people aged 15-24.",
+            "dataset": "une_rt_a",
+            "geo": ["DE", "EL", "FR", "IT", "ES"],
+            "filters": { "sex": "T", "age": "Y15-24", "unit": "PC_ACT" },
+            "chartType": "line"
+        },
+        {
+            "title": "Labour Cost Index",
+            "description": "Index of hourly labour costs faced by employers (2016=100).",
+            "dataset": "lci_r2_a",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "I16", "nace_r2": "B-S", "lcstruct": "D1_D4_MD5" },
+            "chartType": "line"
+        }
+    ]
+}

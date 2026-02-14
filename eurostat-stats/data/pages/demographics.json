@@ -1,0 +1,41 @@
+{
+    "id": "demographics",
+    "title": "Eurostat Demographics Statistics",
+    "subtitle": "Population trends, life expectancy, and fertility across Europe",
+    "metaDescription": "Explore European demographics data from Eurostat. Visualize population, life expectancy, and fertility trends interactively.",
+    "metaKeywords": "Eurostat, demographics, population, life expectancy, fertility, Europe, statistics",
+    "charts": [
+        {
+            "title": "Population (1 January)",
+            "description": "Total population on 1 January of each year.",
+            "dataset": "demo_pjan",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "sex": "T", "age": "TOTAL" },
+            "chartType": "line"
+        },
+        {
+            "title": "Life Expectancy at Birth",
+            "description": "Life expectancy at birth in years, both sexes.",
+            "dataset": "demo_mlexpec",
+            "geo": ["DE", "EL", "FR", "IT", "ES", "SE"],
+            "filters": { "sex": "T", "age": "Y_LT1" },
+            "chartType": "line"
+        },
+        {
+            "title": "Total Fertility Rate",
+            "description": "Mean number of children born per woman over her lifetime.",
+            "dataset": "demo_find",
+            "geo": ["DE", "EL", "FR", "IT", "SE"],
+            "filters": { "indic_de": "TOTFERRT" },
+            "chartType": "line"
+        },
+        {
+            "title": "Population Growth Rate",
+            "description": "Crude rate of total population change (per 1,000 inhabitants).",
+            "dataset": "demo_gind",
+            "geo": ["DE", "EL", "FR", "IT", "PL"],
+            "filters": { "indic_de": "GROWRT" },
+            "chartType": "bar"
+        }
+    ]
+}

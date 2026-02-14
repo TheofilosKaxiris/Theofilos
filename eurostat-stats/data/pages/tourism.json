@@ -1,0 +1,41 @@
+{
+    "id": "tourism",
+    "title": "Eurostat Tourism Statistics",
+    "subtitle": "Explore European tourism trends and accommodation data",
+    "metaDescription": "Discover interactive charts and statistics about European tourism from Eurostat. Visualize tourism trends and data for Europe.",
+    "metaKeywords": "Eurostat, European tourism, tourism statistics, charts, data visualization, Europe, tourism",
+    "charts": [
+        {
+            "title": "Nights Spent at Tourist Accommodations",
+            "description": "Total number of nights spent at hotels and similar establishments, by country.",
+            "dataset": "tour_occ_ninat",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "NR", "c_resid": "TOTAL", "nace_r2": "I551" },
+            "chartType": "line"
+        },
+        {
+            "title": "Accommodation Establishments",
+            "description": "Number of accommodation establishments (hotels, holiday rentals, camping grounds) by country.",
+            "dataset": "tour_cap_nat",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "NR", "accomunit": "ESTBL", "nace_r2": "I551-I553" },
+            "chartType": "line"
+        },
+        {
+            "title": "Arrivals at Tourist Accommodations",
+            "description": "Tourist arrivals at accommodation establishments, comparing countries over time.",
+            "dataset": "tour_occ_anor",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "NR", "c_resid": "TOTAL", "nace_r2": "I551" },
+            "chartType": "line"
+        },
+        {
+            "title": "Tourism Accommodation Capacity",
+            "description": "Number of bed places available in tourist accommodations by country.",
+            "dataset": "tour_cap_nat",
+            "geo": ["DE", "EL", "FR", "IT", "ES"],
+            "filters": { "unit": "NR", "accomunit": "BEDPL", "nace_r2": "I551-I553" },
+            "chartType": "bar"
+        }
+    ]
+}

@@ -1,0 +1,57 @@
+{
+    "id": "economy",
+    "title": "Eurostat Economy Statistics",
+    "subtitle": "Visualize key European economic indicators and trends",
+    "metaDescription": "Explore interactive charts and statistics about the European economy from Eurostat. Visualize economic indicators and trends for Europe.",
+    "metaKeywords": "Eurostat, European economy, economic statistics, charts, data visualization, GDP, inflation, unemployment",
+    "charts": [
+        {
+            "title": "Government Accounts",
+            "description": "Government revenue, expenditure, and balance for EU countries (millions of national currency).",
+            "dataset": "gov_10a_main",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "MIO_NAC", "sector": "S13", "na_item": "TE" },
+            "chartType": "line"
+        },
+        {
+            "title": "GDP Per Capita",
+            "description": "GDP per capita in chain-linked volumes (2010 euros per inhabitant).",
+            "dataset": "nama_10_pc",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "CLV10_EUR_HAB", "na_item": "B1GQ" },
+            "chartType": "line"
+        },
+        {
+            "title": "Gross Domestic Product (GDP)",
+            "description": "GDP at current prices in millions of euros.",
+            "dataset": "nama_10_gdp",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "CP_MEUR", "na_item": "B1GQ" },
+            "chartType": "line"
+        },
+        {
+            "title": "Unemployment Rate",
+            "description": "Unemployment rate as a percentage of the active population (age 15-74).",
+            "dataset": "une_rt_a",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "sex": "T", "age": "Y15-74", "unit": "PC_ACT" },
+            "chartType": "line"
+        },
+        {
+            "title": "Government Deficit / Surplus",
+            "description": "Net lending or net borrowing of general government as a percentage of GDP.",
+            "dataset": "gov_10dd_edpt1",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": { "unit": "PC_GDP", "sector": "S13", "na_item": "B9" },
+            "chartType": "bar"
+        },
+        {
+            "title": "Inflation Rate (HICP Annual)",
+            "description": "Annual average rate of change in the Harmonised Index of Consumer Prices.",
+            "dataset": "tec00118",
+            "geo": ["DE", "EL", "FR", "IT"],
+            "filters": {},
+            "chartType": "line"
+        }
+    ]
+}

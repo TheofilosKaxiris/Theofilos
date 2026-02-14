@@ -1,4 +1,8 @@
-/* Custom Bootstrap color overrides */
+/* Eurostat Stats — Stylesheet
+   Covers: layout, header, nav, cards, charts, explorer, toasts,
+   data tables, export buttons, country picker, responsive. */
+
+/* ── Design Tokens ──────────────────────────────────────── */
 :root {
     --bs-primary: #0f766e;
     --bs-primary-rgb: 15,118,110;
@@ -9,8 +13,12 @@
     --hover-warm: #f97316;
     --bg: #f0f5f3;
     --card-shadow: 0 4px 16px rgba(15,118,110,0.07);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.2s ease;
 }
 
+/* ── Base ────────────────────────────────────────────────── */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: var(--bg);
@@ -22,7 +30,7 @@ body {
     flex-direction: column;
 }
 
-/* Header */
+/* ── Header ──────────────────────────────────────────────── */
 header {
     background: linear-gradient(135deg, #134e4a 0%, #0f766e 50%, #14b8a6 100%);
     color: #fff;
@@ -46,13 +54,15 @@ header .subtitle {
     font-weight: 400;
 }
 
+/* ── Navigation ──────────────────────────────────────────── */
 nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
+    flex-wrap: wrap;
 }
 
 nav a,
@@ -62,9 +72,9 @@ nav a.nav-link {
     color: #a7f3d0;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    padding: 6px 18px;
+    font-size: 0.9rem;
+    transition: all var(--transition);
+    padding: 5px 14px;
     border-radius: 20px;
 }
 
@@ -81,15 +91,15 @@ nav a.nav-link.active {
     background: rgba(167,243,208,0.15);
 }
 
-/* Cards */
+/* ── Cards ────────────────────────────────────────────────── */
 .card {
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius);
     box-shadow: var(--card-shadow);
     padding: 28px 32px;
     margin-bottom: 24px;
     background: #fff;
-    transition: box-shadow 0.2s;
+    transition: box-shadow var(--transition);
 }
 
 .card:hover {
@@ -122,16 +132,25 @@ nav a.nav-link.active {
     color: var(--accent);
 }
 
-/* Chart sections */
+/* ── Chart Sections ──────────────────────────────────────── */
 .chart-section {
     position: relative;
+}
+
+.chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
 }
 
 .chart-section .chart-title {
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--accent);
-    margin-bottom: 12px;
+    margin-bottom: 0;
 }
 
 .chart-section .chart-desc {
@@ -140,13 +159,44 @@ nav a.nav-link.active {
     margin-bottom: 16px;
 }
 
-/* Input group styling */
+.chart-updated {
+    font-size: 0.78rem;
+    margin-bottom: 8px;
+}
+
+/* ── Chart Action Buttons (Table, CSV, PNG, Share) ──────── */
+.chart-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-action {
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid #b2ece4;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    background: var(--bs-primary);
+    color: #fff;
+    border-color: var(--bs-primary);
+}
+
+/* ── Input Group & Fetch Button ──────────────────────────── */
 .input-group .form-control {
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     border: 2px solid #d1d5db;
     font-size: 0.85rem;
     padding: 10px 14px;
-    transition: border-color 0.2s;
+    transition: border-color var(--transition);
 }
 
 .input-group .form-control:focus {
@@ -158,12 +208,13 @@ nav a.nav-link.active {
     background: var(--bs-primary);
     color: #fff;
     border: 2px solid var(--bs-primary);
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     font-weight: 600;
     padding: 10px 20px;
     font-size: 0.85rem;
-    transition: all 0.2s;
+    transition: all var(--transition);
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .btn-fetch:hover {
@@ -172,22 +223,19 @@ nav a.nav-link.active {
     color: #fff;
 }
 
-/* Loading spinner */
+/* ── Loading Spinner ─────────────────────────────────────── */
 .loading-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(255,255,255,0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: var(--radius);
     z-index: 10;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
+    transition: opacity var(--transition);
 }
 
 .loading-overlay.active {
@@ -208,7 +256,276 @@ nav a.nav-link.active {
     to { transform: rotate(360deg); }
 }
 
-/* Dataset Codes expandable section */
+/* ── Explorer Card ───────────────────────────────────────── */
+.explorer-card {
+    border-top: 3px solid var(--bs-primary);
+}
+
+.explorer-field {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.explorer-field > label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-bottom: 6px;
+}
+
+/* Dataset search dropdown */
+.explorer-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: #fff;
+    border: 2px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.explorer-dropdown .dropdown-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.explorer-dropdown .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.explorer-dropdown .dropdown-item:hover {
+    background: #f0faf8;
+}
+
+.dropdown-code {
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--bs-primary);
+    font-size: 0.85rem;
+    min-width: 110px;
+    flex-shrink: 0;
+}
+
+.dropdown-name {
+    font-size: 0.88rem;
+    color: #1e293b;
+    flex: 1;
+}
+
+.dropdown-cat {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.dropdown-empty {
+    padding: 12px 14px;
+    color: #9ca3af;
+    font-size: 0.88rem;
+}
+
+/* Selected dataset badge */
+.selected-dataset-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--accent-light);
+    border-radius: var(--radius-sm);
+    border: 1px solid #b2ece4;
+    font-size: 0.9rem;
+}
+
+.selected-dataset-badge code {
+    font-weight: 700;
+    color: var(--bs-primary);
+}
+
+.badge-remove {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.badge-remove:hover {
+    color: #ef4444;
+}
+
+/* ── Country Presets ─────────────────────────────────────── */
+.country-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.btn-preset {
+    background: #fff;
+    color: var(--accent);
+    border: 2px solid #d1d5db;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-preset:hover {
+    border-color: var(--bs-primary);
+    background: var(--accent-light);
+}
+
+.btn-preset.active {
+    background: var(--bs-primary);
+    color: #fff;
+    border-color: var(--bs-primary);
+}
+
+/* ── Country Picker (Custom) ─────────────────────────────── */
+.country-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 12px;
+    background: #f7faf9;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e5e7eb;
+}
+
+.country-chip {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.country-chip input {
+    display: none;
+}
+
+.country-chip span {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #fff;
+    border: 1.5px solid #d1d5db;
+    color: #374151;
+    transition: all var(--transition);
+}
+
+.country-chip input:checked + span {
+    background: var(--bs-primary);
+    color: #fff;
+    border-color: var(--bs-primary);
+}
+
+.country-chip:hover span {
+    border-color: var(--bs-primary);
+}
+
+/* ── Visualize Button ────────────────────────────────────── */
+.btn-visualize {
+    background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 40px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.3px;
+}
+
+.btn-visualize:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(15,118,110,0.3);
+}
+
+.btn-visualize:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Data Table ──────────────────────────────────────────── */
+.data-table-wrapper {
+    margin-top: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e5e7eb;
+}
+
+.eurostat-data-table {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+.eurostat-data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f0faf8;
+    font-size: 0.8rem;
+}
+
+/* ── Toast Notifications ─────────────────────────────────── */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.eurostat-toast {
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateX(30px);
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    max-width: 380px;
+}
+
+.eurostat-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-info    { background: #3b82f6; }
+.toast-success { background: #22c55e; }
+.toast-error   { background: #ef4444; }
+.toast-warning { background: #f59e0b; color: #1e293b; }
+
+/* ── Dataset Codes (Expandable Sections) ─────────────────── */
 .dataset-codes-section {
     border: 2px solid var(--accent-light);
     border-radius: 10px;
@@ -222,7 +539,7 @@ nav a.nav-link.active {
     padding: 14px 20px;
     background: var(--accent-light);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background var(--transition);
     border: none;
     width: 100%;
     text-align: left;
@@ -251,7 +568,7 @@ nav a.nav-link.active {
 }
 
 .dataset-codes-list.expanded {
-    max-height: 2000px;
+    max-height: 3000px;
 }
 
 .dataset-codes-list .code-item {
@@ -290,7 +607,7 @@ nav a.nav-link.active {
     margin-left: 8px;
 }
 
-/* Accordion improvements */
+/* ── Accordion ───────────────────────────────────────────── */
 .accordion-button {
     font-weight: 600;
     font-size: 1.05rem;
@@ -305,7 +622,7 @@ nav a.nav-link.active {
     box-shadow: 0 0 0 3px rgba(15,118,110,0.15);
 }
 
-/* Table improvements */
+/* ── Tables ──────────────────────────────────────────────── */
 .table th {
     background: #f0faf8;
     font-size: 0.9rem;
@@ -324,29 +641,7 @@ nav a.nav-link.active {
     color: var(--bs-primary);
 }
 
-/* Hero/intro cards */
-.intro-card {
-    background: linear-gradient(135deg, #d5f5f0 0%, #f0f5f3 100%);
-    border-left: 4px solid var(--bs-primary);
-}
-
-.intro-card h3 {
-    color: var(--accent);
-}
-
-/* How-to section */
-.how-to-section {
-    background: #f7faf9;
-}
-
-.how-to-section code {
-    background: var(--accent-light);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-}
-
-/* Footer */
+/* ── Footer ──────────────────────────────────────────────── */
 footer {
     background: #1a2e2b;
     color: rgba(255,255,255,0.7);
@@ -359,17 +654,21 @@ footer {
 footer a {
     color: rgba(255,255,255,0.9);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color var(--transition);
 }
 
 footer a:hover {
     color: var(--hover-warm);
 }
 
-/* Responsive */
+/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
     header h1 {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
+    }
+
+    header .subtitle {
+        font-size: 0.88rem;
     }
 
     .card {
@@ -380,9 +679,18 @@ footer a:hover {
         gap: 4px;
     }
 
-    nav a {
-        padding: 5px 12px;
-        font-size: 0.85rem;
+    nav a, nav a.nav-link {
+        padding: 4px 10px;
+        font-size: 0.78rem;
+    }
+
+    .chart-header {
+        flex-direction: column;
+    }
+
+    .chart-actions {
+        width: 100%;
+        justify-content: flex-start;
     }
 
     .dataset-codes-list .code-item {
@@ -391,5 +699,41 @@ footer a:hover {
 
     .dataset-codes-list .code-item code {
         margin-bottom: 2px;
+    }
+
+    .explorer-dropdown .dropdown-item {
+        flex-wrap: wrap;
+    }
+
+    .dropdown-code {
+        min-width: 80px;
+    }
+
+    .dropdown-cat {
+        width: 100%;
+        margin-top: 2px;
+    }
+
+    .btn-visualize {
+        width: 100%;
+    }
+
+    .country-presets {
+        gap: 4px;
+    }
+
+    .btn-preset {
+        font-size: 0.76rem;
+        padding: 4px 10px;
+    }
+
+    #toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .eurostat-toast {
+        max-width: 100%;
     }
 }
