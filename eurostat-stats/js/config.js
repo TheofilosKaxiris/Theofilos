@@ -75,12 +75,15 @@ const CONFIG = {
 
     // Navigation pages — drives the <nav> bar and dashboard routing
     pages: [
-        { id: 'index',        label: 'Explorer',     href: 'index.html',               icon: 'search' },
-        { id: 'economy',      label: 'Economy',      href: 'dashboard.html?page=economy',      icon: 'chart-line' },
-        { id: 'tourism',      label: 'Tourism',      href: 'dashboard.html?page=tourism',      icon: 'plane' },
-        { id: 'employment',   label: 'Employment',   href: 'dashboard.html?page=employment',   icon: 'briefcase' },
-        { id: 'demographics', label: 'Demographics', href: 'dashboard.html?page=demographics', icon: 'users' },
-        { id: 'environment',  label: 'Environment',  href: 'dashboard.html?page=environment',  icon: 'leaf' },
+        { id: 'index',          label: 'Explorer',     href: 'index.html',                       icon: 'search' },
+        { id: 'economy',        label: 'Economy',      href: 'dashboard.html?page=economy',      icon: 'chart-line' },
+        { id: 'tourism',        label: 'Tourism',      href: 'dashboard.html?page=tourism',      icon: 'plane' },
+        { id: 'employment',     label: 'Employment',   href: 'dashboard.html?page=employment',   icon: 'briefcase' },
+        { id: 'demographics',   label: 'Demographics', href: 'dashboard.html?page=demographics', icon: 'users' },
+        { id: 'environment',    label: 'Environment',  href: 'dashboard.html?page=environment',  icon: 'leaf' },
+        { id: 'superpowers',    label: 'Superpowers',  href: 'superpowers.html',                 icon: 'star' },
+        { id: 'perception-quiz',label: 'Rich or Poor?',href: 'perception-quiz.html',            icon: 'question' },
+        { id: 'move-quiz',      label: 'Move Quiz',    href: 'move-quiz.html',                   icon: 'compass' },
     ],
 
     // Chart type registry keys — supported by charts.js
@@ -479,6 +482,504 @@ const DATASETS = {
         updateFrequency: 'Annual',
     },
 };
+
+// ── Move Quiz Configuration ─────────────────────────────────
+CONFIG.moveQuiz = {
+    questions: [
+        {
+            id: 'weather',
+            label: 'Weather preference',
+            description: 'Do you prefer warm Mediterranean climate or cooler northern weather?',
+            type: 'slider',
+            minLabel: 'Cool & rainy',
+            maxLabel: 'Warm & sunny',
+            weight: 0.2
+        },
+        {
+            id: 'cost',
+            label: 'Cost of living',
+            description: 'How important is a low cost of living to you?',
+            type: 'slider',
+            minLabel: 'Money is no object',
+            maxLabel: 'Budget is key',
+            weight: 0.25
+        },
+        {
+            id: 'career',
+            label: 'Career vs lifestyle',
+            description: 'What matters more — career opportunities or work-life balance?',
+            type: 'slider',
+            minLabel: 'Career growth',
+            maxLabel: 'Work-life balance',
+            weight: 0.2
+        },
+        {
+            id: 'urban',
+            label: 'City vs nature',
+            description: 'Do you prefer urban life or access to nature?',
+            type: 'slider',
+            minLabel: 'Big city energy',
+            maxLabel: 'Nature & space',
+            weight: 0.15
+        },
+        {
+            id: 'english',
+            label: 'English friendliness',
+            description: 'How important is it that locals speak English?',
+            type: 'slider',
+            minLabel: 'I\'ll learn the language',
+            maxLabel: 'English is essential',
+            weight: 0.2
+        }
+    ],
+
+    // Country scores for each dimension (0-100, higher = more of that trait)
+    // These are derived from Eurostat data + reasonable estimates
+    countryScores: {
+        AT: { weather: 35, cost: 30, career: 55, urban: 50, english: 60, name: 'Austria', flag: '\u{1F1E6}\u{1F1F9}' },
+        BE: { weather: 30, cost: 35, career: 65, urban: 75, english: 70, name: 'Belgium', flag: '\u{1F1E7}\u{1F1EA}' },
+        BG: { weather: 55, cost: 90, career: 30, urban: 40, english: 35, name: 'Bulgaria', flag: '\u{1F1E7}\u{1F1EC}' },
+        HR: { weather: 70, cost: 75, career: 35, urban: 35, english: 50, name: 'Croatia', flag: '\u{1F1ED}\u{1F1F7}' },
+        CY: { weather: 95, cost: 50, career: 40, urban: 45, english: 85, name: 'Cyprus', flag: '\u{1F1E8}\u{1F1FE}' },
+        CZ: { weather: 30, cost: 65, career: 50, urban: 55, english: 45, name: 'Czechia', flag: '\u{1F1E8}\u{1F1FF}' },
+        DK: { weather: 20, cost: 20, career: 60, urban: 60, english: 90, name: 'Denmark', flag: '\u{1F1E9}\u{1F1F0}' },
+        EE: { weather: 15, cost: 55, career: 55, urban: 40, english: 75, name: 'Estonia', flag: '\u{1F1EA}\u{1F1EA}' },
+        FI: { weather: 10, cost: 35, career: 55, urban: 35, english: 85, name: 'Finland', flag: '\u{1F1EB}\u{1F1EE}' },
+        FR: { weather: 55, cost: 40, career: 60, urban: 65, english: 40, name: 'France', flag: '\u{1F1EB}\u{1F1F7}' },
+        DE: { weather: 30, cost: 45, career: 75, urban: 70, english: 65, name: 'Germany', flag: '\u{1F1E9}\u{1F1EA}' },
+        EL: { weather: 90, cost: 60, career: 25, urban: 45, english: 55, name: 'Greece', flag: '\u{1F1EC}\u{1F1F7}' },
+        HU: { weather: 45, cost: 80, career: 40, urban: 50, english: 40, name: 'Hungary', flag: '\u{1F1ED}\u{1F1FA}' },
+        IE: { weather: 25, cost: 25, career: 70, urban: 55, english: 100, name: 'Ireland', flag: '\u{1F1EE}\u{1F1EA}' },
+        IT: { weather: 75, cost: 50, career: 45, urban: 60, english: 35, name: 'Italy', flag: '\u{1F1EE}\u{1F1F9}' },
+        LV: { weather: 20, cost: 65, career: 40, urban: 45, english: 55, name: 'Latvia', flag: '\u{1F1F1}\u{1F1FB}' },
+        LT: { weather: 20, cost: 70, career: 45, urban: 45, english: 50, name: 'Lithuania', flag: '\u{1F1F1}\u{1F1F9}' },
+        LU: { weather: 30, cost: 15, career: 70, urban: 70, english: 75, name: 'Luxembourg', flag: '\u{1F1F1}\u{1F1FA}' },
+        MT: { weather: 95, cost: 55, career: 45, urban: 85, english: 95, name: 'Malta', flag: '\u{1F1F2}\u{1F1F9}' },
+        NL: { weather: 25, cost: 30, career: 70, urban: 80, english: 95, name: 'Netherlands', flag: '\u{1F1F3}\u{1F1F1}' },
+        PL: { weather: 30, cost: 75, career: 50, urban: 55, english: 45, name: 'Poland', flag: '\u{1F1F5}\u{1F1F1}' },
+        PT: { weather: 85, cost: 65, career: 35, urban: 50, english: 55, name: 'Portugal', flag: '\u{1F1F5}\u{1F1F9}' },
+        RO: { weather: 50, cost: 85, career: 35, urban: 40, english: 40, name: 'Romania', flag: '\u{1F1F7}\u{1F1F4}' },
+        SK: { weather: 35, cost: 70, career: 45, urban: 45, english: 45, name: 'Slovakia', flag: '\u{1F1F8}\u{1F1F0}' },
+        SI: { weather: 50, cost: 55, career: 45, urban: 40, english: 60, name: 'Slovenia', flag: '\u{1F1F8}\u{1F1EE}' },
+        ES: { weather: 85, cost: 55, career: 40, urban: 65, english: 40, name: 'Spain', flag: '\u{1F1EA}\u{1F1F8}' },
+        SE: { weather: 15, cost: 30, career: 60, urban: 50, english: 90, name: 'Sweden', flag: '\u{1F1F8}\u{1F1EA}' }
+    }
+};
+
+// ── Country Superpowers ─────────────────────────────────────
+CONFIG.superpowers = {
+    AT: {
+        name: 'Austria',
+        flag: '\u{1F1E6}\u{1F1F9}',
+        superpower: 'Highest Quality of Life Index',
+        metric: 'Quality of Life',
+        value: '8.4/10',
+        source: 'EuroFound 2023',
+        funFact: 'Vienna has been ranked the most liveable city in the world 3 years running'
+    },
+    BE: {
+        name: 'Belgium',
+        flag: '\u{1F1E7}\u{1F1EA}',
+        superpower: 'Most Productive Workers',
+        metric: 'GDP per hour worked',
+        value: '€68.50',
+        source: 'Eurostat 2023',
+        funFact: 'Belgian workers produce more value per hour than any other EU nation'
+    },
+    BG: {
+        name: 'Bulgaria',
+        flag: '\u{1F1E7}\u{1F1EC}',
+        superpower: 'Lowest Cost of Living',
+        metric: 'Price Level Index',
+        value: '47 (EU=100)',
+        source: 'Eurostat 2023',
+        funFact: 'Your euro goes twice as far in Sofia as in Paris'
+    },
+    HR: {
+        name: 'Croatia',
+        flag: '\u{1F1ED}\u{1F1F7}',
+        superpower: 'Most Coastline per Capita',
+        metric: 'Adriatic coastline',
+        value: '1,777 km',
+        source: 'Geographic data',
+        funFact: '1,244 islands dot the Croatian coast'
+    },
+    CY: {
+        name: 'Cyprus',
+        flag: '\u{1F1E8}\u{1F1FE}',
+        superpower: 'Sunniest Country',
+        metric: 'Annual sunshine hours',
+        value: '3,400 hours',
+        source: 'Climate data',
+        funFact: 'More sunshine than any EU member state'
+    },
+    CZ: {
+        name: 'Czechia',
+        flag: '\u{1F1E8}\u{1F1FF}',
+        superpower: 'Lowest Unemployment',
+        metric: 'Unemployment rate',
+        value: '2.6%',
+        source: 'Eurostat 2024',
+        funFact: 'Virtually everyone who wants a job has one'
+    },
+    DK: {
+        name: 'Denmark',
+        flag: '\u{1F1E9}\u{1F1F0}',
+        superpower: 'Happiest People',
+        metric: 'Happiness Index',
+        value: '7.6/10',
+        source: 'World Happiness Report 2024',
+        funFact: 'Danes invented hygge — cozy contentment as a lifestyle'
+    },
+    EE: {
+        name: 'Estonia',
+        flag: '\u{1F1EA}\u{1F1EA}',
+        superpower: 'Most Digital Government',
+        metric: 'Digital public services',
+        value: '99% online',
+        source: 'EU Digital Index 2023',
+        funFact: 'Estonians can vote, pay taxes, and start a company from their phone'
+    },
+    FI: {
+        name: 'Finland',
+        flag: '\u{1F1EB}\u{1F1EE}',
+        superpower: 'Best Education System',
+        metric: 'PISA scores',
+        value: 'Top 5 globally',
+        source: 'OECD PISA 2022',
+        funFact: 'Finnish kids have the shortest school days and least homework in Europe'
+    },
+    FR: {
+        name: 'France',
+        flag: '\u{1F1EB}\u{1F1F7}',
+        superpower: 'Most Visited Country',
+        metric: 'International tourists',
+        value: '89M/year',
+        source: 'UNWTO 2023',
+        funFact: 'More people visit France than any other country on Earth'
+    },
+    DE: {
+        name: 'Germany',
+        flag: '\u{1F1E9}\u{1F1EA}',
+        superpower: 'Largest Economy',
+        metric: 'GDP',
+        value: '€4.1 trillion',
+        source: 'Eurostat 2023',
+        funFact: 'Germany alone produces 25% of the EU\'s economic output'
+    },
+    EL: {
+        name: 'Greece',
+        flag: '\u{1F1EC}\u{1F1F7}',
+        superpower: 'Most Islands',
+        metric: 'Number of islands',
+        value: '6,000+',
+        source: 'Geographic data',
+        funFact: 'Only 227 of Greece\'s islands are inhabited'
+    },
+    HU: {
+        name: 'Hungary',
+        flag: '\u{1F1ED}\u{1F1FA}',
+        superpower: 'Most Thermal Springs',
+        metric: 'Thermal baths',
+        value: '1,500+',
+        source: 'Tourism data',
+        funFact: 'Budapest has more thermal baths than any other capital city'
+    },
+    IE: {
+        name: 'Ireland',
+        flag: '\u{1F1EE}\u{1F1EA}',
+        superpower: 'Highest GDP per Capita',
+        metric: 'GDP per capita',
+        value: '€103,000',
+        source: 'Eurostat 2023',
+        funFact: 'Ireland\'s GDP per person exceeds Switzerland and the USA'
+    },
+    IT: {
+        name: 'Italy',
+        flag: '\u{1F1EE}\u{1F1F9}',
+        superpower: 'Most UNESCO Sites',
+        metric: 'World Heritage Sites',
+        value: '59 sites',
+        source: 'UNESCO 2024',
+        funFact: 'More cultural heritage sites than any country on Earth'
+    },
+    LV: {
+        name: 'Latvia',
+        flag: '\u{1F1F1}\u{1F1FB}',
+        superpower: 'Fastest Internet',
+        metric: 'Average broadband speed',
+        value: '90 Mbps',
+        source: 'Speedtest Global Index',
+        funFact: 'Riga has some of the fastest fiber connections in the world'
+    },
+    LT: {
+        name: 'Lithuania',
+        flag: '\u{1F1F1}\u{1F1F9}',
+        superpower: 'Most Fintech Licenses',
+        metric: 'EU fintech licenses',
+        value: '140+',
+        source: 'Bank of Lithuania 2024',
+        funFact: 'Lithuania has become Europe\'s fintech capital'
+    },
+    LU: {
+        name: 'Luxembourg',
+        flag: '\u{1F1F1}\u{1F1FA}',
+        superpower: 'Highest Wages',
+        metric: 'Average annual salary',
+        value: '€72,000',
+        source: 'Eurostat 2023',
+        funFact: 'Luxembourg\'s minimum wage exceeds most countries\' averages'
+    },
+    MT: {
+        name: 'Malta',
+        flag: '\u{1F1F2}\u{1F1F9}',
+        superpower: 'Most English Speakers',
+        metric: 'English proficiency',
+        value: '95%',
+        source: 'Eurobarometer',
+        funFact: 'English is an official language — the only EU country besides Ireland'
+    },
+    NL: {
+        name: 'Netherlands',
+        flag: '\u{1F1F3}\u{1F1F1}',
+        superpower: 'Best Work-Life Balance',
+        metric: 'Part-time employment',
+        value: '50%',
+        source: 'Eurostat 2023',
+        funFact: 'Half of Dutch workers choose part-time — and they\'re the happiest about it'
+    },
+    PL: {
+        name: 'Poland',
+        flag: '\u{1F1F5}\u{1F1F1}',
+        superpower: 'Fastest Growing Economy',
+        metric: '20-year GDP growth',
+        value: '+147%',
+        source: 'Eurostat 2004-2024',
+        funFact: 'Poland is the only EU country to avoid recession during the 2008 crisis'
+    },
+    PT: {
+        name: 'Portugal',
+        flag: '\u{1F1F5}\u{1F1F9}',
+        superpower: 'Best Renewable Energy Growth',
+        metric: 'Renewable share increase',
+        value: '+35% since 2010',
+        source: 'Eurostat Energy',
+        funFact: 'Portugal ran on 100% renewables for 6 days straight in 2024'
+    },
+    RO: {
+        name: 'Romania',
+        flag: '\u{1F1F7}\u{1F1F4}',
+        superpower: 'Fastest Mobile Internet',
+        metric: '5G download speed',
+        value: '220 Mbps',
+        source: 'Opensignal 2024',
+        funFact: 'Bucharest has faster mobile internet than New York or London'
+    },
+    SK: {
+        name: 'Slovakia',
+        flag: '\u{1F1F8}\u{1F1F0}',
+        superpower: 'Most Cars Produced per Capita',
+        metric: 'Car production per capita',
+        value: '202 cars/1000 people',
+        source: 'ACEA 2023',
+        funFact: 'Slovakia builds more cars per person than any country on Earth'
+    },
+    SI: {
+        name: 'Slovenia',
+        flag: '\u{1F1F8}\u{1F1EE}',
+        superpower: 'Most Forested Country',
+        metric: 'Forest coverage',
+        value: '58%',
+        source: 'Eurostat Environment',
+        funFact: 'More than half of Slovenia is covered in forest'
+    },
+    ES: {
+        name: 'Spain',
+        flag: '\u{1F1EA}\u{1F1F8}',
+        superpower: 'Longest Life Expectancy',
+        metric: 'Life expectancy',
+        value: '84 years',
+        source: 'Eurostat 2023',
+        funFact: 'Spaniards live longer than any other EU citizens'
+    },
+    SE: {
+        name: 'Sweden',
+        flag: '\u{1F1F8}\u{1F1EA}',
+        superpower: 'Most Innovative Economy',
+        metric: 'Innovation Index',
+        value: '#1 in EU',
+        source: 'EU Innovation Scoreboard 2024',
+        funFact: 'Sweden has produced more billion-dollar startups per capita than anywhere except Silicon Valley'
+    }
+};
+
+// ── Perception Quiz Configuration ────────────────────────────
+CONFIG.perceptionQuiz = {
+    questions: [
+        {
+            id: 'q1',
+            stats: {
+                'GDP per capita': '€35,000',
+                'Unemployment': '11.5%',
+                'Government debt': '140% of GDP'
+            },
+            answer: 'IT',
+            options: ['IT', 'ES', 'EL', 'PT'],
+            explanation: 'Italy has high GDP per capita but also high unemployment and massive debt — a complex economy that defies simple rich/poor labels.'
+        },
+        {
+            id: 'q2',
+            stats: {
+                'GDP per capita': '€12,000',
+                'Unemployment': '2.8%',
+                'GDP growth (5yr)': '+28%'
+            },
+            answer: 'PL',
+            options: ['PL', 'RO', 'BG', 'HU'],
+            explanation: 'Poland has lower wages than Western Europe but near-full employment and explosive growth. It\'s the EU\'s biggest success story.'
+        },
+        {
+            id: 'q3',
+            stats: {
+                'GDP per capita': '€103,000',
+                'Population': '5.1 million',
+                'Corporate tax haven': 'Yes'
+            },
+            answer: 'IE',
+            options: ['LU', 'IE', 'NL', 'DK'],
+            explanation: 'Ireland\'s GDP is inflated by multinationals routing profits through Dublin, but the wealth effect is real — tech workers earn Silicon Valley salaries.'
+        },
+        {
+            id: 'q4',
+            stats: {
+                'Unemployment': '12.1%',
+                'Youth unemployment': '26%',
+                'Life expectancy': '84.3 years (EU\'s highest)'
+            },
+            answer: 'ES',
+            options: ['ES', 'IT', 'EL', 'PT'],
+            explanation: 'Spain has chronic unemployment but also Europe\'s longest life expectancy. Quality of life isn\'t just about jobs.'
+        },
+        {
+            id: 'q5',
+            stats: {
+                'GDP per capita': '€48,000',
+                'Happiness rank': '#2 in world',
+                'Personal tax rate': 'Up to 55%'
+            },
+            answer: 'DK',
+            options: ['DK', 'SE', 'FI', 'NL'],
+            explanation: 'Denmark: extremely high taxes, extremely happy people. The "expensive = worse" assumption doesn\'t hold.'
+        },
+        {
+            id: 'q6',
+            stats: {
+                'GDP per capita': '€50,000',
+                'Average working hours': '1,349/year (lowest in EU)',
+                'Part-time rate': '50%'
+            },
+            answer: 'NL',
+            options: ['NL', 'DE', 'BE', 'AT'],
+            explanation: 'The Dutch work the fewest hours in Europe yet remain one of the richest. Efficiency over hustle.'
+        },
+        {
+            id: 'q7',
+            stats: {
+                'GDP per capita': '€18,000',
+                'Digital government': 'World\'s most advanced',
+                'Tech startups per capita': 'Higher than Germany'
+            },
+            answer: 'EE',
+            options: ['EE', 'FI', 'LT', 'LV'],
+            explanation: 'Estonia: former Soviet state, now digital pioneer. They skipped the 20th century and built the future.'
+        },
+        {
+            id: 'q8',
+            stats: {
+                'GDP per capita': '€17,500',
+                'Unemployment': '27.3% (2013)',
+                'Tourism revenue': '€20 billion/year'
+            },
+            answer: 'EL',
+            options: ['EL', 'PT', 'HR', 'CY'],
+            explanation: 'Greece went from near-collapse to tourism boom. The 2013 unemployment figure shows how far they\'ve come.'
+        },
+        {
+            id: 'q9',
+            stats: {
+                'GDP per capita': '€128,000',
+                'Population': '660,000',
+                'Banking sector': '22x GDP'
+            },
+            answer: 'LU',
+            options: ['LU', 'IE', 'MT', 'CY'],
+            explanation: 'Luxembourg is absurdly rich on paper, but half the workforce commutes from neighboring countries. The wealth is real but concentrated.'
+        },
+        {
+            id: 'q10',
+            stats: {
+                'GDP per capita': '€9,500',
+                'IT sector growth': '+300% (10yr)',
+                'Emigration': '100,000/year'
+            },
+            answer: 'RO',
+            options: ['RO', 'BG', 'HR', 'PL'],
+            explanation: 'Romania bleeds talent to Western Europe while simultaneously building Europe\'s hottest tech scene. Both things are true.'
+        }
+    ],
+
+    scoreMessages: {
+        '0-3': {
+            title: 'Tourist-Level Knowledge',
+            message: 'You believe the stereotypes. Time to look at the data!'
+        },
+        '4-6': {
+            title: 'Casual Observer',
+            message: 'You know more than most, but Europe\'s economy still has surprises for you.'
+        },
+        '7-8': {
+            title: 'Economics Nerd',
+            message: 'You understand that wealth is complicated. Most people don\'t get this many right.'
+        },
+        '9-10': {
+            title: 'Eurostat Expert',
+            message: 'You either work in EU policy or you spend way too much time on data sites. Either way, impressive.'
+        }
+    }
+};
+
+// ── Card Generator Configuration ─────────────────────────────
+CONFIG.cardTemplates = [
+    {
+        id: 'clean',
+        name: 'Clean',
+        bgColor: '#ffffff',
+        textColor: '#333333',
+        accentColor: '#0d6efd',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+    },
+    {
+        id: 'bold',
+        name: 'Bold',
+        bgColor: '#1a1a2e',
+        textColor: '#ffffff',
+        accentColor: '#e94560',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+    },
+    {
+        id: 'dark',
+        name: 'Dark',
+        bgColor: '#0f0f0f',
+        textColor: '#f0f0f0',
+        accentColor: '#00d4ff',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+    }
+];
+
+CONFIG.cardSizes = [
+    { id: 'square', name: 'Square (1080x1080)', width: 1080, height: 1080, label: 'Instagram' },
+    { id: 'landscape', name: 'Landscape (1200x628)', width: 1200, height: 628, label: 'Twitter/LinkedIn' }
+];
 
 // Helper: build a full Eurostat API URL from a dataset code, geo list, and optional filters
 function buildEurostatUrl(datasetCode, geoList, extraFilters) {

@@ -335,6 +335,19 @@
                     }
                     return;
                 }
+
+                // Card generator
+                if (target.classList.contains('btn-card') && target.dataset.index) {
+                    var cardIdx = parseInt(target.dataset.index, 10);
+                    var chartInstance = chartInstances[cardIdx];
+                    var chartCfg = (pageConfig && pageConfig.charts[cardIdx - 1]) ? pageConfig.charts[cardIdx - 1] : null;
+                    if (chartInstance && chartCfg) {
+                        UI.cardGenerator.showModal(chartInstance, chartCfg.title);
+                    } else {
+                        UI.toast('No chart rendered yet.', 'warning');
+                    }
+                    return;
+                }
             });
 
             // Enter key on URL inputs

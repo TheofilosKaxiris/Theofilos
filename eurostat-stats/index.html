@@ -119,6 +119,7 @@
                                 <button class="btn-action" id="resultTableToggle">Table</button>
                                 <button class="btn-action" id="resultCsvBtn">CSV</button>
                                 <button class="btn-action" id="resultPngBtn">PNG</button>
+                                <button class="btn-action" id="resultCardBtn" title="Create shareable card">Card</button>
                                 <button class="btn-action" id="resultShareBtn">Share</button>
                                 <button class="btn-action" id="resultExplainBtn">Explain</button>
                                 <button class="btn-action" id="resultPinBtn">Pin</button>
@@ -615,6 +616,17 @@
         document.getElementById('resultPngBtn').addEventListener('click', function () {
             if (explorerState.chartInstance) UI.downloadPNG(explorerState.chartInstance, 'eurostat_chart');
             else UI.toast('No chart rendered yet.', 'warning');
+        });
+
+        document.getElementById('resultCardBtn').addEventListener('click', function () {
+            if (explorerState.chartInstance) {
+                var title = explorerState.datasetCode ?
+                    (DATASETS[explorerState.datasetCode]?.name || explorerState.datasetCode) :
+                    'Eurostat Data';
+                UI.cardGenerator.showModal(explorerState.chartInstance, title);
+            } else {
+                UI.toast('No chart rendered yet.', 'warning');
+            }
         });
 
         document.getElementById('resultShareBtn').addEventListener('click', function () {

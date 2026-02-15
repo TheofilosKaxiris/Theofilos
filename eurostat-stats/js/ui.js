@@ -53,6 +53,7 @@ const UI = {
                             '<button class="btn-action btn-table-toggle" title="Toggle data table" data-index="' + index + '">Table</button>' +
                             '<button class="btn-action btn-csv" title="Download CSV" data-index="' + index + '">CSV</button>' +
                             '<button class="btn-action btn-png" title="Download chart as PNG" data-index="' + index + '">PNG</button>' +
+                            '<button class="btn-action btn-card" title="Create shareable card" data-index="' + index + '">Card</button>' +
                             '<button class="btn-action btn-share" title="Copy share link" data-index="' + index + '">Share</button>' +
                             '<button class="btn-action btn-explain" title="Explain this chart" data-index="' + index + '">Explain</button>' +
                         '</div>' +
@@ -297,4 +298,242 @@ const UI = {
         el.textContent = str || '';
         return el.innerHTML;
     },
+};
+
+// ── Card Generator ───────────────────────────────────────────
+UI.cardGenerator = {
+
+    // Generate the card as a canvas element
+    generate: function(chartInstance, options) {
+        var template = options.template;
+        var size = options.size;
+        var title = options.title || 'Eurostat Data';
+        var subtitle = options.subtitle || '';
+
+        // Create off-screen canvas at target size
+        var canvas = document.createElement('canvas');
+        canvas.width = size.width;
+        canvas.height = size.height;
+        var ctx = canvas.getContext('2d');
+
+        // Fill background
+        ctx.fillStyle = template.bgColor;
+        ctx.fillRect(0, 0, size.width, size.height);
+
+        // Calculate layout
+        var padding = Math.round(size.width * 0.05);
+        var titleHeight = Math.round(size.height * 0.12);
+        var footerHeight = Math.round(size.height * 0.08);
+        var chartAreaTop = titleHeight + padding;
+        var chartAreaHeight = size.height - titleHeight - footerHeight - (padding * 2);
+        var chartAreaWidth = size.width - (padding * 2);
+
+        // Draw title
+        ctx.fillStyle = template.textColor;
+        ctx.font = 'bold ' + Math.round(size.height * 0.04) + 'px ' + template.fontFamily;
+        ctx.textAlign = 'center';
+        ctx.fillText(title, size.width / 2, titleHeight * 0.6);
+
+        // Draw subtitle if present
+        if (subtitle) {
+            ctx.font = Math.round(size.height * 0.025) + 'px ' + template.fontFamily;
+            ctx.fillStyle = template.textColor;
+            ctx.globalAlpha = 0.7;
+            ctx.fillText(subtitle, size.width / 2, titleHeight * 0.85);
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw accent line under title
+        ctx.fillStyle = template.accentColor;
+        var lineWidth = size.width * 0.3;
+        ctx.fillRect((size.width - lineWidth) / 2, titleHeight, lineWidth, 3);
+
+        // Get chart as image and draw it
+        var chartImg = new Image();
+        var chartDataUrl = chartInstance.toBase64Image();
+
+        return new Promise(function(resolve) {
+            chartImg.onload = function() {
+                // Calculate scaling to fit chart in available area
+                var scale = Math.min(
+                    chartAreaWidth / chartImg.width,
+                    chartAreaHeight / chartImg.height
+                );
+                var drawWidth = chartImg.width * scale;
+                var drawHeight = chartImg.height * scale;
+                var drawX = (size.width - drawWidth) / 2;
+                var drawY = chartAreaTop + (chartAreaHeight - drawHeight) / 2;
+
+                ctx.drawImage(chartImg, drawX, drawY, drawWidth, drawHeight);
+
+                // Draw footer / watermark
+                ctx.fillStyle = template.textColor;
+                ctx.globalAlpha = 0.5;
+                ctx.font = Math.round(size.height * 0.02) + 'px ' + template.fontFamily;
+                ctx.textAlign = 'center';
+                ctx.fillText('Eurostat Explorer', size.width / 2, size.height - (footerHeight * 0.4));
+                ctx.globalAlpha = 1;
+
+                // Draw accent border
+                ctx.strokeStyle = template.accentColor;
+                ctx.lineWidth = 4;
+                ctx.strokeRect(2, 2, size.width - 4, size.height - 4);
+
+                resolve(canvas);
+            };
+            chartImg.src = chartDataUrl;
+        });
+    },
+
+    // Download the generated card
+    download: function(canvas, filename) {
+        var link = document.createElement('a');
+        link.download = filename || 'eurostat-card.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    },
+
+    // Show the card generator modal
+    showModal: function(chartInstance, chartTitle) {
+        // Remove existing modal if present
+        var existing = document.getElementById('cardGenModal');
+        if (existing) existing.remove();
+
+        var templates = CONFIG.cardTemplates;
+        var sizes = CONFIG.cardSizes;
+
+        var html = '<div class="modal fade" id="cardGenModal" tabindex="-1">';
+        html += '<div class="modal-dialog modal-lg">';
+        html += '<div class="modal-content">';
+        html += '<div class="modal-header">';
+        html += '<h5 class="modal-title">Create Shareable Card</h5>';
+        html += '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        html += '</div>';
+        html += '<div class="modal-body">';
+
+        // Title input
+        html += '<div class="mb-3">';
+        html += '<label class="form-label">Card Title</label>';
+        html += '<input type="text" class="form-control" id="cardTitle" value="' + UI._esc(chartTitle || '') + '">';
+        html += '</div>';
+
+        // Subtitle input
+        html += '<div class="mb-3">';
+        html += '<label class="form-label">Subtitle (optional)</label>';
+        html += '<input type="text" class="form-control" id="cardSubtitle" placeholder="e.g., Source: Eurostat 2024">';
+        html += '</div>';
+
+        // Template selector
+        html += '<div class="mb-3">';
+        html += '<label class="form-label">Template</label>';
+        html += '<div class="d-flex gap-2">';
+        templates.forEach(function(t, i) {
+            var checked = i === 0 ? 'checked' : '';
+            html += '<label class="card p-2 text-center card-template-option" style="cursor:pointer;min-width:80px;">';
+            html += '<input type="radio" name="cardTemplate" value="' + t.id + '" ' + checked + ' class="d-none">';
+            html += '<div class="rounded mb-1" style="height:30px;background:' + t.bgColor + ';border:2px solid ' + t.accentColor + ';"></div>';
+            html += '<small>' + UI._esc(t.name) + '</small>';
+            html += '</label>';
+        });
+        html += '</div></div>';
+
+        // Size selector
+        html += '<div class="mb-3">';
+        html += '<label class="form-label">Size</label>';
+        html += '<div class="d-flex gap-2">';
+        sizes.forEach(function(s, i) {
+            var checked = i === 0 ? 'checked' : '';
+            html += '<label class="btn btn-outline-secondary card-size-option">';
+            html += '<input type="radio" name="cardSize" value="' + s.id + '" ' + checked + ' class="d-none"> ';
+            html += UI._esc(s.label);
+            html += '</label>';
+        });
+        html += '</div></div>';
+
+        // Preview area
+        html += '<div class="mb-3">';
+        html += '<label class="form-label">Preview</label>';
+        html += '<div id="cardPreview" class="border rounded p-2 text-center bg-light" style="min-height:200px;">';
+        html += '<span class="text-muted">Click "Generate Preview" to see your card</span>';
+        html += '</div></div>';
+
+        html += '</div>'; // modal-body
+
+        html += '<div class="modal-footer">';
+        html += '<button type="button" class="btn btn-secondary" id="cardPreviewBtn">Generate Preview</button>';
+        html += '<button type="button" class="btn btn-primary" id="cardDownloadBtn" disabled>Download PNG</button>';
+        html += '</div>';
+
+        html += '</div></div></div>';
+
+        document.body.insertAdjacentHTML('beforeend', html);
+
+        var modal = new bootstrap.Modal(document.getElementById('cardGenModal'));
+        var generatedCanvas = null;
+
+        // Preview button handler
+        document.getElementById('cardPreviewBtn').addEventListener('click', function() {
+            var templateId = document.querySelector('input[name="cardTemplate"]:checked').value;
+            var sizeId = document.querySelector('input[name="cardSize"]:checked').value;
+            var template = templates.find(function(t) { return t.id === templateId; });
+            var size = sizes.find(function(s) { return s.id === sizeId; });
+            var title = document.getElementById('cardTitle').value;
+            var subtitle = document.getElementById('cardSubtitle').value;
+
+            UI.cardGenerator.generate(chartInstance, {
+                template: template,
+                size: size,
+                title: title,
+                subtitle: subtitle
+            }).then(function(canvas) {
+                generatedCanvas = canvas;
+
+                // Show preview (scaled down to fit)
+                var previewDiv = document.getElementById('cardPreview');
+                previewDiv.innerHTML = '';
+                var previewImg = document.createElement('img');
+                previewImg.src = canvas.toDataURL('image/png');
+                previewImg.style.maxWidth = '100%';
+                previewImg.style.maxHeight = '400px';
+                previewDiv.appendChild(previewImg);
+
+                document.getElementById('cardDownloadBtn').disabled = false;
+            });
+        });
+
+        // Download button handler
+        document.getElementById('cardDownloadBtn').addEventListener('click', function() {
+            if (generatedCanvas) {
+                var sizeId = document.querySelector('input[name="cardSize"]:checked').value;
+                UI.cardGenerator.download(generatedCanvas, 'eurostat-card-' + sizeId + '.png');
+                UI.toast('Card downloaded!', 'success');
+            }
+        });
+
+        // Template selection visual feedback
+        document.querySelectorAll('input[name="cardTemplate"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.card-template-option').forEach(function(label) {
+                    label.classList.remove('border-primary');
+                });
+                this.closest('label').classList.add('border-primary');
+            });
+        });
+
+        // Size selection visual feedback
+        document.querySelectorAll('input[name="cardSize"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.card-size-option').forEach(function(label) {
+                    label.classList.remove('active');
+                });
+                this.closest('label').classList.add('active');
+            });
+        });
+
+        // Set initial active state
+        document.querySelector('.card-template-option').classList.add('border-primary');
+        document.querySelector('.card-size-option').classList.add('active');
+
+        modal.show();
+    }
 };

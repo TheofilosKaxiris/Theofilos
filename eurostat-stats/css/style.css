@@ -717,6 +717,49 @@ footer a:hover {
     color: var(--hover-warm);
 }
 
+/* ── Move Quiz Styles ────────────────────────────────────── */
+.quiz-question {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.quiz-question:last-of-type {
+    border-bottom: none;
+}
+
+.quiz-slider-label {
+    min-width: 100px;
+}
+
+.match-card {
+    border: 1px solid #dee2e6;
+    transition: transform 0.15s ease;
+}
+
+.match-card:hover {
+    transform: translateX(4px);
+}
+
+/* ── Card Generator Modal ────────────────────────────────── */
+#cardGenModal .card-template-option input:checked + div {
+    box-shadow: 0 0 0 3px var(--bs-primary);
+}
+
+#cardGenModal .card-template-option.border-primary {
+    border-color: var(--bs-primary) !important;
+    border-width: 2px;
+}
+
+#cardGenModal .card-size-option.active {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+#cardPreview img {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
     header h1 {
@@ -791,5 +834,310 @@ footer a:hover {
 
     .eurostat-toast {
         max-width: 100%;
+    }
+}
+
+/* ── Superpower Cards ────────────────────────────────────── */
+
+.superpower-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.superpower-card {
+    position: relative;
+    height: 360px;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.superpower-card-front,
+.superpower-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: transform 0.6s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.superpower-card-front {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+}
+
+.superpower-card-back {
+    background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+    color: #fff;
+    transform: rotateY(180deg);
+}
+
+.superpower-card:hover .superpower-card-front {
+    transform: rotateY(-180deg);
+}
+
+.superpower-card:hover .superpower-card-back {
+    transform: rotateY(0deg);
+}
+
+.superpower-flag {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.superpower-country {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.superpower-title {
+    font-size: 0.875rem;
+    color: #e94560;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.superpower-metric {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.superpower-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00d4ff;
+    margin-bottom: 0.5rem;
+}
+
+.superpower-source {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.superpower-funfact {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.superpower-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.superpower-card-highlight {
+    animation: superpower-pulse 2s ease-in-out;
+}
+
+@keyframes superpower-pulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(233, 69, 96, 0.6); }
+}
+
+@media (max-width: 576px) {
+    .superpower-card {
+        height: 320px;
+    }
+    .superpower-flag {
+        font-size: 3rem;
+    }
+    .superpower-country {
+        font-size: 1.25rem;
+    }
+    .superpower-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* ── Perception Quiz ─────────────────────────────────────── */
+
+.perception-stats-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    color: #fff;
+}
+
+.perception-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.perception-stat {
+    text-align: center;
+}
+
+.perception-stat-label {
+    font-size: 0.875rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.perception-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00d4ff;
+}
+
+.perception-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.perception-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.perception-option:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-2px);
+}
+
+.perception-option-flag {
+    font-size: 2rem;
+}
+
+.perception-option-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.perception-result {
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.perception-correct {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.perception-incorrect {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.perception-result-icon {
+    margin-right: 0.5rem;
+}
+
+.perception-reveal-flag {
+    font-size: 5rem;
+    margin-bottom: 0.5rem;
+}
+
+.perception-reveal-country {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.perception-explanation {
+    background: #f0faf8;
+    border-left: 4px solid var(--bs-primary);
+    padding: 1rem 1.5rem;
+    border-radius: 0 8px 8px 0;
+}
+
+.perception-final-score {
+    padding: 2rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 12px;
+    color: #fff;
+}
+
+.perception-score-number {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #00d4ff;
+}
+
+.perception-score-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.perception-score-message {
+    color: #ccc;
+}
+
+.perception-breakdown {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.perception-breakdown h4 {
+    margin-bottom: 1rem;
+}
+
+.perception-answer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.perception-answer-row:last-child {
+    border-bottom: none;
+}
+
+.perception-answer-icon {
+    width: 24px;
+    text-align: center;
+}
+
+.perception-answer-correct .perception-answer-icon {
+    color: #22c55e;
+}
+
+.perception-answer-incorrect .perception-answer-icon {
+    color: #ef4444;
+}
+
+@media (max-width: 576px) {
+    .perception-options {
+        grid-template-columns: 1fr;
+    }
+
+    .perception-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .perception-score-number {
+        font-size: 3rem;
+    }
+
+    .perception-reveal-flag {
+        font-size: 4rem;
     }
 }

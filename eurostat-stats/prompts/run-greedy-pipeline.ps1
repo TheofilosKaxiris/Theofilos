@@ -116,11 +116,15 @@ function Invoke-ClaudeStep {
 try {
     $Prompts = "prompts"
 
-    # Find next available run number
-    $Run = 1
-    while (Test-Path "$Prompts/expand-greedy-ideas-$Run.md") {
-        $Run++
+    # Find next run number across both idea and build files
+    $ideaRuns = Get-ChildItem -Path $Prompts -File -Filter "expand-greedy-ideas-*.md" | ForEach-Object {
+        if ($_.BaseName -match '^expand-greedy-ideas-(\d+)$') { [int]$Matches[1] }
     }
+    $buildRuns = Get-ChildItem -Path $Prompts -File -Filter "build-greedy-*.md" | ForEach-Object {
+        if ($_.BaseName -match '^build-greedy-(\d+)$') { [int]$Matches[1] }
+    }
+    $allRuns = @(@($ideaRuns) + @($buildRuns) | Where-Object { $_ -is [int] })
+    $Run = if ($allRuns.Count -gt 0) { (($allRuns | Measure-Object -Maximum).Maximum + 1) } else { 1 }
 
     $IdeasFile = "$Prompts/expand-greedy-ideas-$Run.md"
     $BuildFile = "$Prompts/build-greedy-$Run.md"
@@ -172,6 +176,12 @@ The selected ideas are: $Chosen
 Read the ideas from $IdeasFile, assess each selected idea, then write the implementation file to $BuildFile as described.
 "@
     $null = Invoke-ClaudeStep -StepName "Step 3" -Prompt $step3Prompt -AllowedTools "Read,Write,Glob,Grep,Bash"
+    if (-not (Test-Path $BuildFile)) {
+        throw "Step 3 did not create build file: $BuildFile"
+    }
+    if ([string]::IsNullOrWhiteSpace((Get-Content $BuildFile -Raw))) {
+        throw "Step 3 created an empty build file: $BuildFile"
+    }
 
     Write-Host ""
     Write-Host "=== Step 4: Implement the build plan in code ==="
