@@ -54,6 +54,7 @@ const UI = {
                             '<button class="btn-action btn-csv" title="Download CSV" data-index="' + index + '">CSV</button>' +
                             '<button class="btn-action btn-png" title="Download chart as PNG" data-index="' + index + '">PNG</button>' +
                             '<button class="btn-action btn-share" title="Copy share link" data-index="' + index + '">Share</button>' +
+                            '<button class="btn-action btn-explain" title="Explain this chart" data-index="' + index + '">Explain</button>' +
                         '</div>' +
                     '</div>' +
                     (safeDesc ? '<p class="chart-desc">' + safeDesc + '</p>' : '') +
@@ -69,6 +70,7 @@ const UI = {
                         '<canvas id="chart' + index + '" width="400" height="200"></canvas>' +
                     '</div>' +
                     '<div class="data-table-wrapper" id="table' + index + '" style="display:none;"></div>' +
+                    '<div class="chart-explain" id="explain' + index + '" style="display:none;"></div>' +
                 '</div>' +
             '</section>'
         );
@@ -142,17 +144,150 @@ const UI = {
 
     // ── Share URL ────────────────────────────────────────────
 
-    buildShareUrl(eurostatApiUrl) {
+    buildShareUrl(stateOrUrl) {
         var base = window.location.origin + window.location.pathname;
-        return base + '?url=' + encodeURIComponent(eurostatApiUrl);
+        if (typeof stateOrUrl === 'string') {
+            return base + '?url=' + encodeURIComponent(stateOrUrl);
+        }
+        if (stateOrUrl && typeof stateOrUrl === 'object' && stateOrUrl.dataset) {
+            var params = new URLSearchParams();
+            params.set('dataset', stateOrUrl.dataset);
+            if (Array.isArray(stateOrUrl.geo) && stateOrUrl.geo.length) {
+                params.set('geo', stateOrUrl.geo.join(','));
+            }
+            if (stateOrUrl.type) {
+                params.set('type', stateOrUrl.type);
+            }
+            if (Array.isArray(stateOrUrl.events) && stateOrUrl.events.length) {
+                params.set('events', stateOrUrl.events.join(','));
+            }
+            if (stateOrUrl.majorOnly === false) {
+                params.set('major', '0');
+            }
+            return base + '?' + params.toString();
+        }
+        if (stateOrUrl && typeof stateOrUrl === 'object' && stateOrUrl.url) {
+            return base + '?url=' + encodeURIComponent(stateOrUrl.url);
+        }
+        return base;
     },
 
-    copyShareUrl(eurostatApiUrl) {
-        var url = this.buildShareUrl(eurostatApiUrl);
+    copyShareUrl(stateOrUrl) {
+        var url = this.buildShareUrl(stateOrUrl);
         navigator.clipboard.writeText(url).then(
             function () { UI.toast('Share link copied!', 'success'); },
             function () { UI.toast('Could not copy link.', 'error'); }
         );
+    },
+
+    // ── Explain + Signals ─────────────────────────────────────
+
+    buildChartExplanation(data, datasetCode, options) {
+        options = options || {};
+        var meta = (typeof DATASETS !== 'undefined' && datasetCode && DATASETS[datasetCode]) ? DATASETS[datasetCode] : null;
+        var title = (meta && meta.name) || (data && (data.preferredLabel || data.label)) || 'This indicator';
+        var why = (meta && meta.description) || 'It helps compare long-term trends across countries.';
+
+        if (!data || !Array.isArray(data.data) || data.data.length < 2) {
+            return title + ' provides a comparable view of how countries evolve over time. Why it matters: ' + why + ' Caveat: always compare the same unit and filter selection.';
+        }
+
+        var grouped = {};
+        for (var i = 0; i < data.data.length; i++) {
+            var row = data.data[i];
+            if (!grouped[row.geo]) grouped[row.geo] = [];
+            grouped[row.geo].push(row);
+        }
+
+        var best = null;
+        for (var geo in grouped) {
+            if (!grouped.hasOwnProperty(geo)) continue;
+            var rows = grouped[geo].slice().sort(function (a, b) {
+                return String(a.time).localeCompare(String(b.time));
+            });
+            if (rows.length < 2) continue;
+            var latest = Number(rows[rows.length - 1].value);
+            var prev = Number(rows[rows.length - 2].value);
+            if (!isFinite(latest) || !isFinite(prev) || prev === 0) continue;
+            var pct = ((latest - prev) / Math.abs(prev)) * 100;
+            if (!best || Math.abs(pct) > Math.abs(best.pct)) {
+                best = {
+                    geo: geo,
+                    latest: latest,
+                    prev: prev,
+                    latestYear: rows[rows.length - 1].time,
+                    prevYear: rows[rows.length - 2].time,
+                    pct: pct,
+                };
+            }
+        }
+
+        var trendSentence = '';
+        if (best) {
+            var direction = best.pct >= 0 ? 'up' : 'down';
+            trendSentence = best.geo + ' is ' + direction + ' ' + Math.abs(best.pct).toFixed(1) +
+                '% (' + best.prevYear + '→' + best.latestYear + ', latest value ' + best.latest.toLocaleString() + ').';
+        } else {
+            trendSentence = 'Latest values are available, but there is not enough consecutive numeric history for a robust year-on-year change.';
+        }
+
+        return title + ' tracks this measure across countries and years. ' +
+            trendSentence + ' Why it matters: ' + why + ' Caveat: check units and definitions before drawing conclusions.';
+    },
+
+    buildSignalItems(data, datasetCode) {
+        if (!data || !Array.isArray(data.data) || !data.data.length) return [];
+        var threshold = (typeof CONFIG !== 'undefined' && CONFIG.signalFeed && typeof CONFIG.signalFeed.yoyThresholdPct === 'number')
+            ? CONFIG.signalFeed.yoyThresholdPct
+            : 2;
+        var maxItems = (typeof CONFIG !== 'undefined' && CONFIG.signalFeed && typeof CONFIG.signalFeed.maxItems === 'number')
+            ? CONFIG.signalFeed.maxItems
+            : 5;
+        var datasetName = (typeof DATASETS !== 'undefined' && datasetCode && DATASETS[datasetCode])
+            ? DATASETS[datasetCode].name
+            : (data.preferredLabel || data.label || 'Indicator');
+
+        var grouped = {};
+        for (var i = 0; i < data.data.length; i++) {
+            var row = data.data[i];
+            if (!grouped[row.geo]) grouped[row.geo] = [];
+            grouped[row.geo].push(row);
+        }
+
+        var signals = [];
+        for (var geo in grouped) {
+            if (!grouped.hasOwnProperty(geo)) continue;
+            var rows = grouped[geo].slice().sort(function (a, b) {
+                return String(a.time).localeCompare(String(b.time));
+            });
+            if (rows.length < 2) continue;
+            var latest = Number(rows[rows.length - 1].value);
+            var prev = Number(rows[rows.length - 2].value);
+            if (!isFinite(latest) || !isFinite(prev) || prev === 0) continue;
+            var pct = ((latest - prev) / Math.abs(prev)) * 100;
+            if (Math.abs(pct) < threshold) continue;
+            signals.push({
+                id: datasetCode + '_' + geo + '_' + rows[rows.length - 1].time,
+                absChange: Math.abs(pct),
+                text: geo + ': ' + datasetName + ' changed ' + (pct >= 0 ? '+' : '') + pct.toFixed(1) +
+                    '% in ' + rows[rows.length - 1].time + ' (YoY).',
+            });
+        }
+
+        signals.sort(function (a, b) { return b.absChange - a.absChange; });
+        return signals.slice(0, maxItems);
+    },
+
+    signalFeedHTML(items, emptyText) {
+        if (!Array.isArray(items) || !items.length) {
+            return '<p class="text-muted mb-0">' + this._esc(emptyText || 'No notable updates yet.') + '</p>';
+        }
+        var html = '<ul class="signal-feed-list">';
+        for (var i = 0; i < items.length; i++) {
+            html += '<li class="signal-feed-item">' + this._esc(items[i].text) + '</li>';
+        }
+        html += '</ul>';
+        return html;
     },
 
     // ── Helpers ──────────────────────────────────────────────

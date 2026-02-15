@@ -4,6 +4,13 @@
 async function fetchEurostatData(eurostatUrl, options) {
     options = options || {};
     var skipCache = options.skipCache || false;
+    var datasetCodeMatch = (typeof eurostatUrl === 'string')
+        ? eurostatUrl.match(/\/data\/([^/?#]+)/i)
+        : null;
+    var datasetCode = datasetCodeMatch ? decodeURIComponent(datasetCodeMatch[1]) : '';
+    var preferredLabel = (typeof DATASETS !== 'undefined' && DATASETS[datasetCode] && DATASETS[datasetCode].name)
+        ? DATASETS[datasetCode].name
+        : '';
 
     // Check cache first
     if (!skipCache && typeof EurostatCache !== 'undefined') {
@@ -30,6 +37,13 @@ async function fetchEurostatData(eurostatUrl, options) {
         var dimension = eurostatData && eurostatData.dimension || {};
         var size = eurostatData && eurostatData.size || [];
         var label = eurostatData && eurostatData.label || '';
+        var dimensionOrder = Array.isArray(eurostatData && eurostatData.id) ? eurostatData.id.slice() : [];
+        if (!dimensionOrder.length && Array.isArray(dimension.id)) {
+            dimensionOrder = dimension.id.slice();
+        }
+        if (!dimensionOrder.length) {
+            dimensionOrder = Object.keys(dimension).filter(function (k) { return k !== 'id'; });
+        }
 
         var getKeysFromIndex = function (dim) {
             if (!dim || !dim.category) return [];
@@ -43,11 +57,57 @@ async function fetchEurostatData(eurostatUrl, options) {
             return [];
         };
 
+        var dimSizes = Array.isArray(size) ? size.slice() : [];
+        if (dimSizes.length !== dimensionOrder.length) {
+            dimSizes = dimensionOrder.map(function (dimName, idx) {
+                if (typeof size[idx] === 'number') return size[idx];
+                var keys = getKeysFromIndex(dimension[dimName]);
+                return keys.length || 1;
+            });
+        }
+
+        var strides = new Array(dimSizes.length);
+        var stride = 1;
+        for (var i = dimSizes.length - 1; i >= 0; i--) {
+            strides[i] = stride;
+            stride *= (dimSizes[i] || 1);
+        }
+
+        var getDimIndex = function (flatIndex, dimPos) {
+            if (dimPos < 0 || dimPos >= dimSizes.length) return 0;
+            var dimSize = dimSizes[dimPos] || 1;
+            return Math.floor(flatIndex / strides[dimPos]) % dimSize;
+        };
+
         var geoDim = dimension.geo || {};
         var timeDim = dimension.time || {};
+        var unitDim = dimension.unit || {};
         var geoKeys = getKeysFromIndex(geoDim);
         var timeKeys = getKeysFromIndex(timeDim);
+        var unitKeys = getKeysFromIndex(unitDim);
         var geoLabels = (geoDim.category && geoDim.category.label) ? geoDim.category.label : {};
+        var unitLabelMap = (unitDim.category && unitDim.category.label) ? unitDim.category.label : {};
+        var geoPos = dimensionOrder.indexOf('geo');
+        var timePos = dimensionOrder.indexOf('time');
+        var unitPos = dimensionOrder.indexOf('unit');
+
+        var inferredUnitCode = '';
+        var inferredUnitLabel = '';
+        var mixedUnits = false;
+        var registerUnitCode = function (code) {
+            if (!code) return;
+            if (!inferredUnitCode) {
+                inferredUnitCode = code;
+                inferredUnitLabel = unitLabelMap[code] || '';
+                return;
+            }
+            if (inferredUnitCode !== code) {
+                mixedUnits = true;
+            }
+        };
+        if (unitKeys.length === 1) {
+            registerUnitCode(unitKeys[0]);
+        }
 
         var results = [];
         for (var key in valueDict) {
@@ -55,8 +115,11 @@ async function fetchEurostatData(eurostatUrl, options) {
             var val = valueDict[key];
             var flatIndex = parseInt(key, 10);
             if (Number.isNaN(flatIndex)) continue;
-            var timeIdx = timeKeys.length ? (flatIndex % timeKeys.length) : 0;
-            var geoIdx = timeKeys.length ? Math.floor(flatIndex / timeKeys.length) : 0;
+            var geoIdx = getDimIndex(flatIndex, geoPos);
+            var timeIdx = getDimIndex(flatIndex, timePos);
+            if (unitPos !== -1 && unitKeys.length > 1) {
+                registerUnitCode(unitKeys[getDimIndex(flatIndex, unitPos)] || '');
+            }
             results.push({
                 geo: geoLabels[geoKeys[geoIdx]] || geoKeys[geoIdx] || '',
                 geoCode: geoKeys[geoIdx] || '',
@@ -64,11 +127,24 @@ async function fetchEurostatData(eurostatUrl, options) {
                 value: String(val),
             });
         }
+        if (mixedUnits) {
+            inferredUnitCode = '';
+            inferredUnitLabel = 'Mixed units';
+        }
 
         var updated = typeof eurostatData.updated === 'string' ? eurostatData.updated : '';
-        var sizes = Array.isArray(size) ? size : [];
 
-        var data = { updated: updated, size: sizes, data: results, label: label, _fromCache: false };
+        var data = {
+            updated: updated,
+            size: dimSizes,
+            data: results,
+            label: label,
+            preferredLabel: preferredLabel || label,
+            datasetCode: datasetCode,
+            unitCode: inferredUnitCode,
+            unitLabel: inferredUnitLabel,
+            _fromCache: false,
+        };
 
         // Store in cache
         if (typeof EurostatCache !== 'undefined') {

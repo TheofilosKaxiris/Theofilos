@@ -47,7 +47,24 @@
                     data-ad-slot="1234567890"></ins>
             </div>
             <main id="chartsContainer" class="col-12 col-lg-8 d-flex flex-column align-items-center py-3">
-                <!-- Chart cards injected here by JS -->
+                <section class="card w-100 my-2">
+                    <div class="card-body">
+                        <h2>Signal Feed</h2>
+                        <p class="text-muted mb-2">Notable year-on-year changes detected while loading this dashboard.</p>
+                        <div id="dashboardSignalFeed"></div>
+                    </div>
+                </section>
+                <section class="card w-100 my-2">
+                    <div class="card-body">
+                        <h2>Event Overlay Packs</h2>
+                        <div id="dashboardEventPackControls" class="event-pack-controls mb-2"></div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="dashboardMajorOnly" checked>
+                            <label class="form-check-label" for="dashboardMajorOnly">Only major events</label>
+                        </div>
+                    </div>
+                </section>
+                <div id="dashboardChartsHost" class="w-100"></div>
             </main>
             <div class="col-lg-2 d-none d-lg-flex flex-column align-items-center justify-content-start p-0">
                 <ins class="adsbygoogle"
@@ -64,6 +81,7 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/cache.js"></script>
     <script src="js/ui.js"></script>
@@ -78,6 +96,11 @@
         var chartInstances = {};
         var chartDataStore = {};
         var pageConfig = null;
+        var dashboardState = {
+            timelinePacks: ['macro'],
+            majorEventsOnly: true,
+            signalMap: {},
+        };
 
         function getPageId() {
             var params = new URLSearchParams(window.location.search);
@@ -112,7 +135,7 @@
         }
 
         function renderChartCards(charts) {
-            var container = document.getElementById('chartsContainer');
+            var container = document.getElementById('dashboardChartsHost');
             var html = '';
             for (var i = 0; i < charts.length; i++) {
                 var c = charts[i];
@@ -127,6 +150,77 @@
             container.innerHTML = html;
         }
 
+        function renderEventPackControls() {
+            var host = document.getElementById('dashboardEventPackControls');
+            var packs = CONFIG.eventOverlayPacks || {};
+            var keys = Object.keys(packs);
+            var html = '';
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var checked = dashboardState.timelinePacks.indexOf(key) !== -1 ? ' checked' : '';
+                html += '<div class="form-check form-check-inline">' +
+                    '<input class="form-check-input dashboard-event-pack" type="checkbox" id="dashEventPack_' + key + '" value="' + key + '"' + checked + '>' +
+                    '<label class="form-check-label" for="dashEventPack_' + key + '">' + UI._esc(packs[key].label || key) + '</label>' +
+                '</div>';
+            }
+            host.innerHTML = html;
+            document.getElementById('dashboardMajorOnly').checked = dashboardState.majorEventsOnly;
+        }
+
+        function getTimelineOptionsForChart(index) {
+            var chartCfg = (pageConfig && pageConfig.charts[index - 1]) ? pageConfig.charts[index - 1] : null;
+            return {
+                packs: dashboardState.timelinePacks.slice(),
+                majorOnly: dashboardState.majorEventsOnly,
+                countryCode: chartCfg && Array.isArray(chartCfg.geo) && chartCfg.geo.length ? chartCfg.geo[0] : '',
+            };
+        }
+
+        function renderDashboardSignalFeed() {
+            var items = Object.values(dashboardState.signalMap || {}).sort(function (a, b) {
+                return b.absChange - a.absChange;
+            });
+            var maxItems = (CONFIG.signalFeed && typeof CONFIG.signalFeed.maxItems === 'number') ? CONFIG.signalFeed.maxItems : 5;
+            document.getElementById('dashboardSignalFeed').innerHTML = UI.signalFeedHTML(
+                items.slice(0, maxItems),
+                'No notable updates yet.'
+            );
+        }
+
+        function mergeSignals(items) {
+            if (!Array.isArray(items)) return;
+            for (var i = 0; i < items.length; i++) {
+                dashboardState.signalMap[items[i].id] = items[i];
+            }
+            renderDashboardSignalFeed();
+        }
+
+        function applyTimelineSettings() {
+            var checked = document.querySelectorAll('.dashboard-event-pack:checked');
+            dashboardState.timelinePacks = Array.from(checked).map(function (el) { return el.value; });
+            if (!dashboardState.timelinePacks.length) {
+                dashboardState.timelinePacks = ['macro'];
+                renderEventPackControls();
+            }
+            dashboardState.majorEventsOnly = !!document.getElementById('dashboardMajorOnly').checked;
+            var keys = Object.keys(chartDataStore);
+            for (var i = 0; i < keys.length; i++) {
+                var idx = parseInt(keys[i], 10);
+                if (!idx) continue;
+                var chartCfg = (pageConfig && pageConfig.charts[idx - 1]) ? pageConfig.charts[idx - 1] : null;
+                chartInstances[idx] = renderEurostatChart(
+                    chartDataStore[idx],
+                    'chart' + idx,
+                    chartInstances[idx],
+                    {
+                        chartType: chartCfg ? chartCfg.chartType : 'line',
+                        chartTitle: chartCfg ? chartCfg.title : '',
+                        timelineOptions: getTimelineOptionsForChart(idx),
+                    }
+                );
+            }
+        }
+
         async function fetchChart(index) {
             var inputEl = document.getElementById('input' + index);
             var loadingEl = document.getElementById('loading' + index);
@@ -139,12 +233,25 @@
             try {
                 var data = await fetchEurostatData(url);
                 if (data) {
-                    var chartType = (pageConfig && pageConfig.charts[index - 1])
-                        ? pageConfig.charts[index - 1].chartType : 'line';
+                    var chartCfg = (pageConfig && pageConfig.charts[index - 1]) ? pageConfig.charts[index - 1] : null;
+                    var chartType = chartCfg ? chartCfg.chartType : 'line';
+                    var chartTitle = chartCfg ? chartCfg.title : '';
                     chartInstances[index] = renderEurostatChart(
-                        data, 'chart' + index, chartInstances[index], { chartType: chartType }
+                        data,
+                        'chart' + index,
+                        chartInstances[index],
+                        {
+                            chartType: chartType,
+                            chartTitle: chartTitle,
+                            timelineOptions: getTimelineOptionsForChart(index),
+                        }
                     );
                     chartDataStore[index] = data;
+                    var explainEl = document.getElementById('explain' + index);
+                    if (explainEl) explainEl.style.display = 'none';
+                    var explainBtn = document.querySelector('.btn-explain[data-index="' + index + '"]');
+                    if (explainBtn) explainBtn.textContent = 'Explain';
+                    mergeSignals(UI.buildSignalItems(data, chartCfg ? chartCfg.dataset : data.datasetCode));
 
                     // Show cache/update indicator
                     if (updatedEl) {
@@ -207,6 +314,27 @@
                     if (inp) UI.copyShareUrl(inp.value);
                     return;
                 }
+
+                // Explain
+                if (target.classList.contains('btn-explain') && target.dataset.index) {
+                    var explainIdx = parseInt(target.dataset.index, 10);
+                    var explainEl = document.getElementById('explain' + explainIdx);
+                    var data = chartDataStore[explainIdx];
+                    var cfg = (pageConfig && pageConfig.charts[explainIdx - 1]) ? pageConfig.charts[explainIdx - 1] : null;
+                    if (!explainEl || !data) {
+                        UI.toast('No data loaded yet.', 'warning');
+                        return;
+                    }
+                    if (explainEl.style.display === 'none') {
+                        explainEl.textContent = UI.buildChartExplanation(data, cfg ? cfg.dataset : data.datasetCode);
+                        explainEl.style.display = 'block';
+                        target.textContent = 'Hide Explain';
+                    } else {
+                        explainEl.style.display = 'none';
+                        target.textContent = 'Explain';
+                    }
+                    return;
+                }
             });
 
             // Enter key on URL inputs
@@ -218,6 +346,9 @@
                     if (!isNaN(idx)) fetchChart(idx);
                 }
             });
+
+            document.getElementById('dashboardEventPackControls').addEventListener('change', applyTimelineSettings);
+            document.getElementById('dashboardMajorOnly').addEventListener('change', applyTimelineSettings);
         }
 
         // ── Init ─────────────────────────────────────────────
@@ -228,6 +359,8 @@
             try {
                 pageConfig = loadPageConfig(pageId);
                 applyMeta(pageConfig);
+                renderEventPackControls();
+                renderDashboardSignalFeed();
                 renderChartCards(pageConfig.charts);
                 bindActions();
 
@@ -238,7 +371,7 @@
             } catch (err) {
                 console.error('Failed to load page config:', err);
                 UI.toast('Failed to load dashboard: ' + err.message, 'error');
-                document.getElementById('chartsContainer').innerHTML =
+                document.getElementById('dashboardChartsHost').innerHTML =
                     '<div class="card w-100 my-2"><div class="card-body">' +
                     '<h2>Page not found</h2><p>The dashboard "' + UI._esc(pageId) + '" could not be loaded. ' +
                     '<a href="index.html">Return to Explorer</a>.</p></div></div>';

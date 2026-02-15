@@ -33,6 +33,22 @@ const CONFIG = {
         },
     },
 
+    unitLabels: {
+        CLV10_EUR_HAB: 'Euros per inhabitant (2010 chain-linked)',
+        CP_MEUR: 'Millions of EUR',
+        MIO_NAC: 'Millions of national currency',
+        PC_ACT: '% of active population',
+        PC_GDP: '% of GDP',
+        PC: '%',
+        THS_PER: 'Thousands of persons',
+        NR: 'Count',
+        I15: 'Index (2015=100)',
+        I16: 'Index (2016=100)',
+        INX_A_AVG: 'Index (annual average)',
+        THS_T: 'Thousand tonnes',
+        T: 'Tonnes',
+    },
+
     defaultGeo: ['DE', 'EL', 'FR', 'IT'],
 
     countryPresets: {
@@ -69,6 +85,58 @@ const CONFIG = {
 
     // Chart type registry keys — supported by charts.js
     chartTypes: ['line', 'bar', 'stacked-area', 'grouped-bar'],
+
+    timelineEvents: [
+        { year: '2008', label: 'Financial Crisis', major: true },
+        { year: '2010', label: 'Euro Debt Crisis', major: true },
+        { year: '2015', label: 'Migration Crisis', major: false },
+        { year: '2020', label: 'COVID-19', major: true },
+        { year: '2022', label: 'Energy Crisis', major: true },
+    ],
+
+    eventOverlayPacks: {
+        macro: {
+            label: 'Macro shocks',
+            events: [
+                { year: '2008', label: 'Financial Crisis', major: true },
+                { year: '2010', label: 'Euro Debt Crisis', major: true },
+                { year: '2015', label: 'Migration Crisis', major: false },
+                { year: '2020', label: 'COVID-19', major: true },
+                { year: '2022', label: 'Energy Crisis', major: true },
+            ],
+        },
+        policy: {
+            label: 'EU policy milestones',
+            events: [
+                { year: '2002', label: 'Euro Cash Changeover', major: true },
+                { year: '2007', label: 'EU Enlargement (BG/RO)', major: false },
+                { year: '2019', label: 'European Green Deal', major: true },
+                { year: '2021', label: 'Recovery and Resilience Facility', major: true },
+            ],
+        },
+        country: {
+            label: 'Country markers',
+            events: [
+                { year: '2001', label: 'Greece joins euro', geo: 'EL', major: true },
+                { year: '2007', label: 'Cyprus joins euro', geo: 'CY', major: false },
+                { year: '2007', label: 'Malta joins euro', geo: 'MT', major: false },
+                { year: '2009', label: 'Slovakia joins euro', geo: 'SK', major: false },
+                { year: '2011', label: 'Estonia joins euro', geo: 'EE', major: false },
+                { year: '2014', label: 'Latvia joins euro', geo: 'LV', major: false },
+                { year: '2015', label: 'Lithuania joins euro', geo: 'LT', major: false },
+                { year: '2023', label: 'Croatia joins euro', geo: 'HR', major: true },
+            ],
+        },
+    },
+
+    signalFeed: {
+        yoyThresholdPct: 2,
+        maxItems: 5,
+    },
+
+    myDashboard: {
+        storageKey: 'eurostat_my_dashboard_v1',
+    },
 
     // Page configs — embedded so dashboard.html works without fetching JSON
     // (fetch fails on file:// protocol due to CORS restrictions)

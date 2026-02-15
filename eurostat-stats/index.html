@@ -86,6 +86,16 @@
                             </select>
                         </div>
 
+                        <!-- Event Overlay Packs -->
+                        <div class="explorer-field">
+                            <label>Event overlays</label>
+                            <div id="eventPackControls" class="event-pack-controls"></div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="majorEventsOnly" checked>
+                                <label class="form-check-label" for="majorEventsOnly">Only major events</label>
+                            </div>
+                        </div>
+
                         <!-- Visualize Button -->
                         <button id="visualizeBtn" class="btn-visualize" disabled>Visualize</button>
 
@@ -110,6 +120,8 @@
                                 <button class="btn-action" id="resultCsvBtn">CSV</button>
                                 <button class="btn-action" id="resultPngBtn">PNG</button>
                                 <button class="btn-action" id="resultShareBtn">Share</button>
+                                <button class="btn-action" id="resultExplainBtn">Explain</button>
+                                <button class="btn-action" id="resultPinBtn">Pin</button>
                             </div>
                         </div>
                         <p class="chart-desc" id="resultDesc"></p>
@@ -121,6 +133,28 @@
                             <canvas id="resultChart" width="400" height="200"></canvas>
                         </div>
                         <div class="data-table-wrapper" id="resultTable" style="display:none;"></div>
+                        <div class="chart-explain" id="resultExplain" style="display:none;"></div>
+                    </div>
+                </section>
+
+                <section class="card w-100 my-2">
+                    <div class="card-body">
+                        <h2>Signal Feed</h2>
+                        <p class="text-muted mb-2">Notable year-on-year changes from your latest visualization.</p>
+                        <div id="signalFeedContainer"></div>
+                    </div>
+                </section>
+
+                <section class="card w-100 my-2">
+                    <div class="card-body">
+                        <h2>My Dashboard</h2>
+                        <p class="text-muted mb-2">Pin charts and reopen them instantly. Stored locally in your browser.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button class="btn-action" id="dashboardExportBtn">Export JSON</button>
+                            <button class="btn-action" id="dashboardImportBtn">Import JSON</button>
+                            <input type="file" id="dashboardImportInput" accept="application/json" style="display:none;">
+                        </div>
+                        <div id="myDashboardList"></div>
                     </div>
                 </section>
 
@@ -150,6 +184,7 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/cache.js"></script>
     <script src="js/ui.js"></script>
@@ -162,13 +197,18 @@
             datasetCode: null,
             geo: CONFIG.defaultGeo.slice(),
             chartType: 'line',
+            timelinePacks: ['macro'],
+            majorEventsOnly: true,
             chartInstance: null,
             chartData: null,
             lastUrl: null,
+            signalItems: [],
         };
 
         // ── Nav ──────────────────────────────────────────────
         document.getElementById('mainNav').innerHTML = UI.navHTML('index');
+        var signalFeedContainer = document.getElementById('signalFeedContainer');
+        var myDashboardList = document.getElementById('myDashboardList');
 
         // ── Dataset Search & Dropdown ────────────────────────
         var searchInput = document.getElementById('datasetSearch');
@@ -235,6 +275,7 @@
                 explorerState.datasetCode = null;
                 selectedBadge.style.display = 'none';
                 document.getElementById('visualizeBtn').disabled = true;
+                window.history.replaceState({}, '', window.location.pathname);
             }
         });
 
@@ -291,10 +332,189 @@
             explorerState.geo = Array.from(checked).map(function (cb) { return cb.value; });
         }
 
+        function parseGeoParam(rawGeo) {
+            if (!rawGeo) return [];
+            return rawGeo
+                .split(',')
+                .map(function (g) { return g.trim().toUpperCase(); })
+                .filter(function (g) { return !!g; });
+        }
+
+        function syncCountryPickerFromState() {
+            var inputs = customPicker.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].checked = explorerState.geo.indexOf(inputs[i].value) !== -1;
+            }
+        }
+
+        function parseListParam(raw) {
+            if (!raw) return [];
+            return raw
+                .split(',')
+                .map(function (item) { return item.trim(); })
+                .filter(function (item) { return !!item; });
+        }
+
+        function getTimelineOptions() {
+            return {
+                packs: explorerState.timelinePacks.slice(),
+                majorOnly: explorerState.majorEventsOnly,
+                countryCode: explorerState.geo.length ? explorerState.geo[0] : '',
+            };
+        }
+
+        function renderEventPackControls() {
+            var host = document.getElementById('eventPackControls');
+            var packs = CONFIG.eventOverlayPacks || {};
+            var keys = Object.keys(packs);
+            var html = '';
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var checked = explorerState.timelinePacks.indexOf(key) !== -1 ? ' checked' : '';
+                html += '<div class="form-check form-check-inline">' +
+                    '<input class="form-check-input event-pack-input" type="checkbox" id="eventPack_' + key + '" value="' + key + '"' + checked + '>' +
+                    '<label class="form-check-label" for="eventPack_' + key + '">' + UI._esc(packs[key].label || key) + '</label>' +
+                '</div>';
+            }
+            host.innerHTML = html;
+            document.getElementById('majorEventsOnly').checked = explorerState.majorEventsOnly;
+        }
+
+        function syncTimelineFromControls() {
+            var checked = document.querySelectorAll('.event-pack-input:checked');
+            explorerState.timelinePacks = Array.from(checked).map(function (el) { return el.value; });
+            if (!explorerState.timelinePacks.length) {
+                explorerState.timelinePacks = ['macro'];
+                renderEventPackControls();
+            }
+            explorerState.majorEventsOnly = !!document.getElementById('majorEventsOnly').checked;
+            if (explorerState.chartData) {
+                explorerState.chartInstance = renderEurostatChart(
+                    explorerState.chartData,
+                    'resultChart',
+                    explorerState.chartInstance,
+                    {
+                        chartType: explorerState.chartType,
+                        chartTitle: document.getElementById('resultTitle').textContent,
+                        timelineOptions: getTimelineOptions(),
+                    }
+                );
+            }
+            if (explorerState.datasetCode) updateExplorerUrlState();
+        }
+
+        function renderSignalFeed() {
+            signalFeedContainer.innerHTML = UI.signalFeedHTML(
+                explorerState.signalItems,
+                'No notable year-on-year shifts yet. Visualize a dataset to populate the feed.'
+            );
+        }
+
+        function getDashboardStorageKey() {
+            return (CONFIG.myDashboard && CONFIG.myDashboard.storageKey) ? CONFIG.myDashboard.storageKey : 'eurostat_my_dashboard_v1';
+        }
+
+        function loadDashboardState() {
+            try {
+                var raw = localStorage.getItem(getDashboardStorageKey());
+                if (!raw) return { pinned: [], defaultViewId: null };
+                var parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed.pinned)) parsed.pinned = [];
+                return parsed;
+            } catch (err) {
+                return { pinned: [], defaultViewId: null };
+            }
+        }
+
+        function saveDashboardState(state) {
+            localStorage.setItem(getDashboardStorageKey(), JSON.stringify(state));
+        }
+
+        function applyPinnedView(item) {
+            if (!item || !item.dataset) return;
+            explorerState.geo = Array.isArray(item.geo) && item.geo.length ? item.geo.slice() : CONFIG.defaultGeo.slice();
+            explorerState.chartType = item.type || 'line';
+            explorerState.timelinePacks = Array.isArray(item.events) && item.events.length ? item.events.slice() : ['macro'];
+            explorerState.majorEventsOnly = item.majorOnly !== false;
+            document.getElementById('chartTypeSelect').value = explorerState.chartType;
+            syncCountryPickerFromState();
+            var customBtn = document.querySelector('.btn-preset[data-preset="custom"]');
+            if (customBtn) {
+                setActivePreset(customBtn);
+                customPicker.style.display = 'flex';
+            }
+            renderEventPackControls();
+            selectDataset(item.dataset);
+            var meta = DATASETS[item.dataset];
+            var filters = meta ? meta.defaultFilters : {};
+            var url = buildEurostatUrl(item.dataset, explorerState.geo, filters);
+            doVisualize(url, explorerState.chartType);
+        }
+
+        function renderMyDashboard() {
+            var state = loadDashboardState();
+            if (!state.pinned.length) {
+                myDashboardList.innerHTML = '<p class="text-muted mb-0">No pinned charts yet. Use <strong>Pin</strong> after visualizing a chart.</p>';
+                return;
+            }
+            var html = '<div class="my-dashboard-list">';
+            for (var i = 0; i < state.pinned.length; i++) {
+                var item = state.pinned[i];
+                var title = (DATASETS[item.dataset] && DATASETS[item.dataset].name) ? DATASETS[item.dataset].name : item.dataset;
+                var isDefault = state.defaultViewId && state.defaultViewId === item.id;
+                html += '<div class="my-dashboard-item">' +
+                    '<div>' +
+                        '<div><strong>' + UI._esc(title) + '</strong></div>' +
+                        '<div class="my-dashboard-meta">' + UI._esc(item.dataset + ' • ' + (item.geo || []).join(', ') + ' • ' + (item.type || 'line')) + '</div>' +
+                    '</div>' +
+                    '<div class="d-flex gap-1">' +
+                        '<button class="btn-action dashboard-load" data-id="' + item.id + '">Load</button>' +
+                        '<button class="btn-action dashboard-default" data-id="' + item.id + '">' + (isDefault ? 'Default ✓' : 'Set default') + '</button>' +
+                        '<button class="btn-action dashboard-remove" data-id="' + item.id + '">Remove</button>' +
+                    '</div>' +
+                '</div>';
+            }
+            html += '</div>';
+            myDashboardList.innerHTML = html;
+        }
+
         // ── Chart Type ───────────────────────────────────────
         document.getElementById('chartTypeSelect').addEventListener('change', function () {
             explorerState.chartType = this.value;
+            if (explorerState.chartData) {
+                explorerState.chartInstance = renderEurostatChart(
+                    explorerState.chartData,
+                    'resultChart',
+                    explorerState.chartInstance,
+                    {
+                        chartType: explorerState.chartType,
+                        chartTitle: document.getElementById('resultTitle').textContent,
+                        timelineOptions: getTimelineOptions(),
+                    }
+                );
+            }
+            if (explorerState.datasetCode) updateExplorerUrlState();
         });
+
+        document.getElementById('eventPackControls').addEventListener('change', syncTimelineFromControls);
+        document.getElementById('majorEventsOnly').addEventListener('change', syncTimelineFromControls);
+
+        function updateExplorerUrlState() {
+            if (!explorerState.datasetCode) return;
+            var params = new URLSearchParams();
+            params.set('dataset', explorerState.datasetCode);
+            if (explorerState.geo.length) {
+                params.set('geo', explorerState.geo.join(','));
+            }
+            params.set('type', explorerState.chartType);
+            if (explorerState.timelinePacks.length) {
+                params.set('events', explorerState.timelinePacks.join(','));
+            }
+            if (!explorerState.majorEventsOnly) {
+                params.set('major', '0');
+            }
+            window.history.replaceState({}, '', window.location.pathname + '?' + params.toString());
+        }
 
         // ── Visualize ────────────────────────────────────────
         document.getElementById('visualizeBtn').addEventListener('click', async function () {
@@ -335,11 +555,21 @@
             try {
                 var data = await fetchEurostatData(url);
                 if (data) {
+                    var configuredTitle = (explorerState.datasetCode && DATASETS[explorerState.datasetCode])
+                        ? DATASETS[explorerState.datasetCode].name
+                        : '';
                     explorerState.chartInstance = renderEurostatChart(
-                        data, 'resultChart', explorerState.chartInstance, { chartType: chartType }
+                        data,
+                        'resultChart',
+                        explorerState.chartInstance,
+                        {
+                            chartType: chartType,
+                            chartTitle: configuredTitle || data.preferredLabel || data.label,
+                            timelineOptions: getTimelineOptions(),
+                        }
                     );
                     explorerState.chartData = data;
-                    titleEl.textContent = data.label || 'Chart';
+                    titleEl.textContent = configuredTitle || data.preferredLabel || data.label || 'Chart';
 
                     // Description from config if available
                     if (explorerState.datasetCode && DATASETS[explorerState.datasetCode]) {
@@ -351,6 +581,13 @@
                     var updateText = data.updated ? 'Data updated: ' + data.updated : '';
                     if (data._fromCache) updateText += ' (cached)';
                     updatedEl.textContent = updateText;
+                    document.getElementById('resultExplain').style.display = 'none';
+                    document.getElementById('resultExplainBtn').textContent = 'Explain';
+                    explorerState.signalItems = UI.buildSignalItems(data, explorerState.datasetCode || data.datasetCode);
+                    renderSignalFeed();
+                    if (explorerState.datasetCode) {
+                        updateExplorerUrlState();
+                    }
                 }
             } finally {
                 loading.classList.remove('active');
@@ -381,7 +618,128 @@
         });
 
         document.getElementById('resultShareBtn').addEventListener('click', function () {
+            if (explorerState.datasetCode) {
+                UI.copyShareUrl({
+                    dataset: explorerState.datasetCode,
+                    geo: explorerState.geo,
+                    type: explorerState.chartType,
+                    events: explorerState.timelinePacks,
+                    majorOnly: explorerState.majorEventsOnly,
+                });
+                return;
+            }
             if (explorerState.lastUrl) UI.copyShareUrl(explorerState.lastUrl);
+        });
+
+        document.getElementById('resultExplainBtn').addEventListener('click', function () {
+            if (!explorerState.chartData) {
+                UI.toast('No data loaded yet.', 'warning');
+                return;
+            }
+            var explainEl = document.getElementById('resultExplain');
+            if (explainEl.style.display === 'none') {
+                explainEl.textContent = UI.buildChartExplanation(
+                    explorerState.chartData,
+                    explorerState.datasetCode || explorerState.chartData.datasetCode,
+                    { geo: explorerState.geo }
+                );
+                explainEl.style.display = 'block';
+                this.textContent = 'Hide Explain';
+            } else {
+                explainEl.style.display = 'none';
+                this.textContent = 'Explain';
+            }
+        });
+
+        document.getElementById('resultPinBtn').addEventListener('click', function () {
+            if (!explorerState.datasetCode) {
+                UI.toast('Pin works with dataset-based explorer views.', 'warning');
+                return;
+            }
+            var state = loadDashboardState();
+            var id = explorerState.datasetCode + '|' + explorerState.geo.join(',') + '|' + explorerState.chartType + '|' + explorerState.timelinePacks.join(',');
+            for (var i = 0; i < state.pinned.length; i++) {
+                if (state.pinned[i].id === id) {
+                    UI.toast('This view is already pinned.', 'info');
+                    return;
+                }
+            }
+            state.pinned.unshift({
+                id: id,
+                dataset: explorerState.datasetCode,
+                geo: explorerState.geo.slice(),
+                type: explorerState.chartType,
+                events: explorerState.timelinePacks.slice(),
+                majorOnly: explorerState.majorEventsOnly,
+            });
+            saveDashboardState(state);
+            renderMyDashboard();
+            UI.toast('Pinned to My Dashboard.', 'success');
+        });
+
+        myDashboardList.addEventListener('click', function (e) {
+            var loadBtn = e.target.closest('.dashboard-load');
+            var removeBtn = e.target.closest('.dashboard-remove');
+            var defaultBtn = e.target.closest('.dashboard-default');
+            if (!loadBtn && !removeBtn && !defaultBtn) return;
+            var state = loadDashboardState();
+            var id = (loadBtn || removeBtn || defaultBtn).dataset.id;
+            var item = state.pinned.find(function (entry) { return entry.id === id; });
+            if (!item) return;
+
+            if (loadBtn) {
+                applyPinnedView(item);
+                return;
+            }
+            if (removeBtn) {
+                state.pinned = state.pinned.filter(function (entry) { return entry.id !== id; });
+                if (state.defaultViewId === id) state.defaultViewId = null;
+                saveDashboardState(state);
+                renderMyDashboard();
+                return;
+            }
+            if (defaultBtn) {
+                state.defaultViewId = id;
+                saveDashboardState(state);
+                renderMyDashboard();
+                UI.toast('Default landing view updated.', 'success');
+            }
+        });
+
+        document.getElementById('dashboardExportBtn').addEventListener('click', function () {
+            var state = loadDashboardState();
+            var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'eurostat_my_dashboard.json';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+
+        document.getElementById('dashboardImportBtn').addEventListener('click', function () {
+            document.getElementById('dashboardImportInput').click();
+        });
+
+        document.getElementById('dashboardImportInput').addEventListener('change', function () {
+            if (!this.files || !this.files.length) return;
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onload = function () {
+                try {
+                    var imported = JSON.parse(String(reader.result || '{}'));
+                    if (!imported || !Array.isArray(imported.pinned)) throw new Error('Invalid dashboard file.');
+                    saveDashboardState({
+                        pinned: imported.pinned,
+                        defaultViewId: imported.defaultViewId || null,
+                    });
+                    renderMyDashboard();
+                    UI.toast('Dashboard imported.', 'success');
+                } catch (err) {
+                    UI.toast(err.message || 'Failed to import dashboard.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            this.value = '';
         });
 
         // ── Dataset Catalog ──────────────────────────────────
@@ -431,12 +789,63 @@
         // ── Handle share URL on page load ────────────────────
         (function handleShareUrl() {
             var params = new URLSearchParams(window.location.search);
+            var sharedDataset = params.get('dataset');
+            var sharedGeo = parseGeoParam(params.get('geo'));
+            var sharedType = params.get('type');
+            var sharedEvents = parseListParam(params.get('events'));
+            var majorParam = params.get('major');
+
+            if (sharedType && CONFIG.chartTypes.indexOf(sharedType) !== -1) {
+                explorerState.chartType = sharedType;
+                document.getElementById('chartTypeSelect').value = sharedType;
+            }
+            if (sharedEvents.length) {
+                explorerState.timelinePacks = sharedEvents;
+            }
+            if (majorParam === '0') {
+                explorerState.majorEventsOnly = false;
+            }
+            renderEventPackControls();
+
+            if (sharedDataset) {
+                if (sharedGeo.length) {
+                    explorerState.geo = sharedGeo;
+                    syncCountryPickerFromState();
+                    var customBtn = document.querySelector('.btn-preset[data-preset="custom"]');
+                    if (customBtn) {
+                        setActivePreset(customBtn);
+                        customPicker.style.display = 'flex';
+                    }
+                }
+                selectDataset(sharedDataset);
+                var sharedMeta = DATASETS[sharedDataset];
+                var sharedFilters = sharedMeta ? sharedMeta.defaultFilters : {};
+                var shareUrl = buildEurostatUrl(sharedDataset, explorerState.geo, sharedFilters);
+                doVisualize(shareUrl, explorerState.chartType);
+                return;
+            }
+
             var sharedUrl = params.get('url');
             if (sharedUrl) {
                 document.getElementById('rawUrlInput').value = sharedUrl;
                 doVisualize(sharedUrl, explorerState.chartType);
+                return;
+            }
+
+            var dashboardState = loadDashboardState();
+            if (dashboardState.defaultViewId) {
+                var defaultItem = dashboardState.pinned.find(function (entry) {
+                    return entry.id === dashboardState.defaultViewId;
+                });
+                if (defaultItem) {
+                    applyPinnedView(defaultItem);
+                }
             }
         })();
+
+        renderEventPackControls();
+        renderSignalFeed();
+        renderMyDashboard();
 
         try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
         try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
